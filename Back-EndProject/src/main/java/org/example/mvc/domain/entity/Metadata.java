@@ -14,11 +14,10 @@ public class Metadata {
     private int fileSeq;
     private String userName;
     private boolean fileType;
+    private boolean thumbnailCheck;
     private int size;
     private Date createTime;
     private String fileName;
     private String filePath;
     private String originalPath;
-    private String thumbnailPath;
-
 }
