@@ -3,8 +3,7 @@ package org.example.mvc.domain.dto;
 import lombok.Data;
 
 @Data
-public class MetadataDTO {
-    private int fileSeq;
+public class MetadataInsertDTO {
     private String userName;
     private boolean fileType;
     private boolean thumbnailCheck;
@@ -13,9 +12,9 @@ public class MetadataDTO {
     private String filePath;
     private String originalPath;
 
-    public MetadataDTO(){}
+    public MetadataInsertDTO(){}
 
-    public MetadataDTO(String userName, boolean fileType, int size, String fileName, String filePath,String originalPath,boolean thumbnailPath){
+    public MetadataInsertDTO(String userName, boolean fileType, int size, String fileName, String filePath, String originalPath, boolean thumbnailPath){
         this.userName = userName;
         this.fileType = fileType;
         this.size = size;
