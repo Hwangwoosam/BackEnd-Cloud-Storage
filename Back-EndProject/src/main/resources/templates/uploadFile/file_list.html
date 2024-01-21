@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>파일목록</title>
+    <link rel="stylesheet" href="/css/file_list.css">
+</head>
+<body>
+
+<div class="mb-5 d-flex flex-column justify-content-end">
+    <div>
+        <a class="btn btn-info text-white" href="/">메인</a>
+    </div>
+</div>
+
+<section class="notice">
+    <div class="page-title">
+        <div class="container">
+            <h3>파일업로드 리스트</h3>
+        </div>
+    </div>
+
+    <!-- board seach area -->
+    <div id="board-search">
+        <div class="container">
+            <div class="search-window">
+                <form action="">
+                    <div class="search-wrap">
+                        <label for="search" class="blind">공지사항 내용 검색</label>
+                        <input id="search" type="search" name="" placeholder="검색어를 입력해주세요." value="">
+                        <button type="submit" class="btn btn-dark">검색</button>
+                    </div>
+                    <div>
+                        <a class="btn btn-info text-white" href="../fileUpload">파일 업로드</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- board list area -->
+    <div id="board-list">
+        <div class="container">
+            <table class="board-table">
+                <thead>
+                <tr>
+                    <th colspan="7">
+                        <div id="displayCount" class="d-flex justify-content-end"></div>
+                    </th>
+                </tr>
+                </thead>
+                <thead>
+                <tr>
+                    <th scope="col">번호</th>
+                    <th scope="col">썸네일</th>
+                    <th scope="col">파일이름</th>
+                    <th scope="col">파일크기</th>
+                    <th scope="col">파일경로</th>
+                    <th scope="col">생성날짜</th>
+                    <th scope="col">삭제</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if = "${fileList.isEmpty()}">
+                    <td class="text-center" colspan="8">등록된 데이터가 없습니다.</td>
+                </tr>
+                <div th:if="${not fileList.isEmpty()}">
+                    <tr th:each="fileInfo : ${fileList}">
+                            <td th:text="${fileInfo.fileSeq}"></td>
+                            <td th:if="${fileInfo.thumbnailCheck}">
+                                <img th:src="${fileInfo.originalPath}">
+                            </td>
+                            <td th:if="${!fileInfo.thumbnailCheck}">X</td>
+                            <td th:text="${fileInfo.fileName}"></td>
+                            <td th:text="${fileInfo.fileSize}"></td>
+                            <td th:text="${fileInfo.filePath}"></td>
+                            <td th:text="${fileInfo.createTime}"></td>
+                            <td>
+                                <form method="post" th:action="'/file/delete/' + *{fileInfo.fileSeq}">
+                                    <button type="submit">삭제</button>
+                                </form>
+                            </td>
+                    </tr>
+                </div>
+
+                </tbody>
+            </table>
+            <ul id="pagingul">
+            </ul>
+        </div>
+
+    </div>
+
+</section>
+
+</body>
+</html>
+
