@@ -16,23 +16,23 @@ public class UploadFileDTO {
     private int fileSize;
     private String fileName;
     private String filePath;
-    private String originalPath;
+    private String originalName;
     private Date createTime;
 
     public UploadFileDTO(){
 
     }
 
-    public UploadFileDTO(int fileSeq,String userName, boolean thumbnailCheck
+    public UploadFileDTO(int fileSeq, String userName, boolean thumbnailCheck
                             , int size, String fileName, String filePath,
-                         String originalPath, Date createTime){
+                         String originalName, Date createTime){
         this.fileSeq = fileSeq;
         this.userName = userName;
         this.thumbnailCheck = thumbnailCheck;
         this.fileSize = size;
         this.fileName = fileName;
         this.filePath = filePath;
-        this.originalPath = originalPath;
+        this.originalName = originalName;
         this.createTime = createTime;
     }
 }
