@@ -3,67 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <title>파일업로드 테스트</title>
-    <link rel="stylesheet" href="../../static/css/file_list.css"  >
+    <link rel="stylesheet" href="../../static/css/file_list.css">
+    <style>
+        .highlight {
+            border: 2px solid red;
+        }
+    </style>
 </head>
 <body>
 
 <div class="row mt-5" id="file-upload-container">
     <div class="col-md-4 offset-md-2 text-center">
         <div class="mb-5 d-flex justify-content-end">
-            <a class="btn btn-info text-white" href="/file/getList">파일목록</a>
+            <a class="btn btn-info text-white" href="#" onclick="validateAndNavigate('/file/getList')">파일목록</a>
         </div>
-
-        <h2>1.파일 업로드 테스트</h2>
-        <form action="/file/save" enctype="multipart/form-data" method="post">
+        <h2>1. 파일 업로드 테스트(thymeleaf 사용) </h2>
+        <form id="uploadForm" action="/file/save" enctype="multipart/form-data" method="post" onsubmit="return validateForm()">
             <label>사용자 이름</label>
             <input type="text" name="userName" id="userName" th:value="${userName}">
+            <br>
             <input type="file" name="uploadFile" id="uploadFile1" th:value="${multipartFile}"/>
             <button type="submit">파일업로드</button>
         </form>
         <br>
         <div class="imgView" id="image_container1"></div>
-
-
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-
-        <h2>2.파일 업로드 테스트2</h2>
-        <form action="/file/fileSave" enctype="multipart/form-data" method="post">
-            <div class="input-group">
-                <input type="file" class="form-control" name="uploadFile" id="uploadFile2" data-view="image_container2" onchange="setThumbnail(event);">
-                <button class="btn btn-primary" type="button" id="uploadBtn2">파일업로드</button>
-            </div>
-        </form>
-        <br>
-        <div class="imgView" id="image_container2"></div>
-
-
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-
-        <h2>3.멀티 파일 업로드 테스트</h2>
-        <form action="/file/fileSave" enctype="multipart/form-data" method="post">
-            <div class="input-group">
-                <input type="file" class="form-control" name="uploadFile" id="uploadFile3" data-view="image_container3" onchange="setThumbnail(event);" multiple>
-                <button class="btn btn-primary" type="button" id="uploadBtn3">파일업로드</button>
-            </div>
-        </form>
-        <br>
-        <div class="imgView" id="image_container3"></div>
-
-
     </div>
 </div>
 
+<script>
+    function validateAndNavigate(url) {
+        var userNameInput = document.getElementById('userName');
 
-<!--<script src="/static/js/file_upload.js"></script>-->
+        if (userNameInput.value.trim() === '') {
+            userNameInput.classList.add('highlight');
+            alert('사용자 이름을 입력하세요.');
+            return false;
+        } else {
+            userNameInput.classList.remove('highlight');
 
+            window.location.href = url + '?userName=' + encodeURIComponent(userNameInput.value);
+            return false;
+        }
+    }
+
+    function validateForm() {
+        var userNameInput = document.getElementById('userName');
+
+        if (userNameInput.value.trim() === '') {
+            userNameInput.classList.add('highlight');
+            alert('사용자 이름을 입력하세요.');
+            return false;
+        } else {
+            userNameInput.classList.remove('highlight');
+            return true;
+        }
+    }
+</script>
 
 </body>
 </html>
