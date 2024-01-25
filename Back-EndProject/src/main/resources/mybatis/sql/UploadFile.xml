@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.example.mvc.repository.UploadFileRepository">
-    <select id="getUploadFileList" resultType="org.example.mvc.domain.dto.UploadFileDTO">
+    <select id="getList" resultType="org.example.mvc.domain.dto.MetaDataDTO">
         SELECT
             UF.fileSeq,
             UF.userName,
@@ -9,12 +9,26 @@
             UF.fileSize,
             UF.fileName,
             UF.filePath,
-            UF.originalPath,
+            UF.originalName,
             UF.createTime
         FROM metadata UF
     </select>
 
-    <insert id="save" parameterType="org.example.mvc.domain.dto.MetadataInsertDTO">
+    <select id="get" resultType="org.example.mvc.domain.dto.MetaDataDTO">
+        SELECT
+            UF.fileSeq,
+            UF.userName,
+            UF.thumbnailCheck,
+            UF.fileSize,
+            UF.fileName,
+            UF.filePath,
+            UF.originalName,
+            UF.createTime
+        FROM metadata UF
+        WHERE UF.fileSeq = #{fileSeq}
+    </select>
+
+    <insert id="save" parameterType="org.example.mvc.domain.dto.UploadFileDTO">
         INSERT INTO metadata
         (
             userName,
@@ -23,7 +37,7 @@
             fileName,
             thumbnailCheck,
             filePath,
-            originalPath,
+            originalName,
             createTime
         )
         VALUES
@@ -34,7 +48,7 @@
             #{fileName},
             #{thumbnailCheck},
             #{filePath},
-            #{originalPath},
+            #{originalName},
             NOW()
         )
     </insert>
