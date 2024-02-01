@@ -24,6 +24,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 //@Slf4j
 @Service
@@ -38,7 +40,8 @@ public class UploadFileService {
 
     public void fileSave(MultipartFile multipartFile,String userName){
         String uploadFilePath = globalConfig.getUploadFilePath();
-        String prefix = multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().lastIndexOf(".") + 1, multipartFile.getOriginalFilename().length());
+        int idxOfDot = multipartFile.getOriginalFilename().lastIndexOf(".");
+        String prefix = multipartFile.getOriginalFilename().substring(idxOfDot + 1, multipartFile.getOriginalFilename().length());
 
         boolean thumbnailCheck = isImageFile(prefix);
 
@@ -52,12 +55,14 @@ public class UploadFileService {
 
         String pathname = uploadFilePath + filename;
 
-        try{
+        String originalFileName = checkDuplicateFileName(multipartFile.getOriginalFilename(),uploadFilePath,prefix);
+
+        try {
             UploadFileDTO parameter = new UploadFileDTO();
             parameter.setUserName(userName);
             parameter.setFileType(false);
-            parameter.setSize((int)multipartFile.getSize());
-            parameter.setFileName(multipartFile.getOriginalFilename());
+            parameter.setSize((int) multipartFile.getSize());
+            parameter.setFileName(originalFileName);
             parameter.setFilePath(uploadFilePath);
             parameter.setOriginalName(filename);
             parameter.setThumbnailCheck(thumbnailCheck);
@@ -75,8 +80,8 @@ public class UploadFileService {
         uploadFileRepository.save(metadataInsertDTO);
     }
 
-    public List<MetaDataDTO> getList(){
-        return uploadFileRepository.getList();
+    public List<MetaDataDTO> getList(String userName){
+        return uploadFileRepository.getList(userName);
     }
 
     public MetaDataDTO get(int fileSeq){
@@ -117,5 +122,33 @@ public class UploadFileService {
         headers.setContentDispositionFormData("attachment", encodedFileName);
 
         return new ResponseEntity<>(fileData, headers, HttpStatus.OK);
+    }
+
+    public String checkDuplicateFileName(String fileName,String uploadFilePath,String prefix){
+        List<String> fileNames = uploadFileRepository.checkFileName();
+
+        if(fileNames.isEmpty()) return fileName;
+
+        String result = "";
+
+        Pattern p = Pattern.compile("(.*)\\s\\(([0-9]+)\\)[.].*");
+        Matcher m = p.matcher(fileName);
+
+        if(m.find()){
+            int nextIdx = Integer.parseInt(m.group(2)) + 1;
+            result = m.group(1) + " (" + Integer.toString(nextIdx) + ")." + prefix;
+        }else{
+            String originalFileName = fileName.substring(0,fileName.lastIndexOf("."));
+            String dest = "";
+
+            for(int i = 1; i < Integer.MAX_VALUE; i++){
+                dest = String.format("%s (%d).%s", originalFileName, i, prefix);
+                if(!fileNames.contains(dest)) break;
+            }
+            result = dest;
+        }
+
+
+        return result;
     }
 }

@@ -12,6 +12,7 @@
             UF.originalName,
             UF.createTime
         FROM metadata UF
+        WHERE UF.userName = #{userName}
     </select>
 
     <select id="get" resultType="org.example.mvc.domain.dto.MetaDataDTO">
@@ -57,4 +58,10 @@
         DELETE FROM metadata
         WHERE fileSeq = #{fileSeq}
     </delete>
+
+    <select id="checkFileName" resultType="String">
+        SELECT
+            UF.fileName
+        FROM metadata UF
+    </select>
 </mapper>

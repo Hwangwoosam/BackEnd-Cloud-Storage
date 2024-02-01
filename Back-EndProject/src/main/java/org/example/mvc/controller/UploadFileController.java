@@ -4,7 +4,6 @@ import org.example.configuration.GlobalConfig;
 import org.example.configuration.exception.BaseException;
 import org.example.configuration.http.BaseResponseCode;
 import org.example.mvc.domain.dto.MetaDataDTO;
-import org.example.mvc.domain.dto.UploadFileDTO;
 import org.example.mvc.service.UploadFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +19,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -32,9 +32,8 @@ public class UploadFileController {
     @Autowired
     private UploadFileService uploadFileService;
 
-    @RequestMapping("/save")
+    @PostMapping("/save")
     public String save(@RequestParam("uploadFile") MultipartFile multipartFile, @RequestParam("userName") String userName, Model model) throws IOException{
-
         if(multipartFile == null || multipartFile.isEmpty()){
             throw new BaseException(BaseResponseCode.DATA_IS_NULL, new String[]{"업로드 파일"});
         }
@@ -44,7 +43,6 @@ public class UploadFileController {
         }
 
         logger.debug("save : {}",userName);
-        model.addAttribute("userName",userName);
 
         String encodedUserName;
         try {
@@ -57,22 +55,31 @@ public class UploadFileController {
         return "redirect:/file/getList?userName=" + encodedUserName;
     }
 
-    @GetMapping("/getList")
-    public String getList(@RequestParam(name = "userName",required = false)String userName,Model model){
-        List<MetaDataDTO> list = uploadFileService.getList();
-        model.addAttribute("userName",userName);
+    @GetMapping(value = "/getList")
+    public String getList(@RequestParam String userName, Model model) {
+        List<MetaDataDTO> list = uploadFileService.getList(userName);
+
+        model.addAttribute("userName", userName);
         model.addAttribute("fileList",list);
         return "uploadFile/file_list.html";
     }
 
     @PostMapping("/delete/{fileSeq}")
-    public String delete(@PathVariable int fileSeq){
+    public String delete(@RequestParam int fileSeq,@RequestParam String userName){
+        logger.debug("delete : {}",fileSeq);
         if(fileSeq < 0){
             throw new BaseException(BaseResponseCode.VALIDATE_REQUIRED,new String[]{"파일 번호"});
         }
 
         uploadFileService.delete(fileSeq);
-        return "redirect:/file/getList";
+        String encodedUserName;
+        try {
+            encodedUserName = URLEncoder.encode(userName, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Error encoding userName", e);
+        }
+
+        return "redirect:/file/getList?userName=" + encodedUserName;
     }
 
     @GetMapping("/download/{fileSeq}")

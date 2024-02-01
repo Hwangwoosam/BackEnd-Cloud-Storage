@@ -13,10 +13,12 @@ public interface UploadFileRepository {
 
     void getFileInfo(MultipartFile multipartFile,String userName);
     void save(UploadFileDTO uploadFileParameter);
-    List<MetaDataDTO> getList();
+    List<MetaDataDTO> getList(String userName);
     MetaDataDTO get(int fileSeq);
     void delete(int fileSeq);
 
     ResponseEntity<byte[]> downloadFile(int fileSeq);
+
+    List<String> checkFileName();
 
 }
