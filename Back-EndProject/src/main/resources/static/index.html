@@ -1,13 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>BackEnd 개인 프로젝트</title>
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/login.css">
+    <script src="/js/login.js" defer></script>
 </head>
-
 <body>
-<h2>Back-End Project</h2>
-<a href="/login">Cloud Storage (2024.01.18 ~ )</a>
+
+<form id="loginForm">
+    <label for="userName">사용자 이름:</label>
+    <input type="text" id="userName" name="userName" required>
+    <button type="button" onclick="login()">로그인</button>
+</form>
 
 </body>
 </html>
