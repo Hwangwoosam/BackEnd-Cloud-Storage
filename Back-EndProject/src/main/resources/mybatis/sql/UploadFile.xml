@@ -6,13 +6,15 @@
             UF.fileSeq,
             UF.userName,
             UF.thumbnailCheck,
+            UF.fileType,
             UF.fileSize,
             UF.fileName,
             UF.filePath,
             UF.originalName,
+            UF.includeDir,
             UF.createTime
         FROM metadata UF
-        WHERE UF.userName = #{userName}
+        WHERE UF.userName = #{userName} and UF.includeDir = #{includeDir}
     </select>
 
     <select id="get" resultType="org.example.mvc.domain.dto.MetaDataDTO">
@@ -39,6 +41,7 @@
             thumbnailCheck,
             filePath,
             originalName,
+            includeDir,
             createTime
         )
         VALUES
@@ -50,6 +53,7 @@
             #{thumbnailCheck},
             #{filePath},
             #{originalName},
+            #{includeDir},
             NOW()
         )
     </insert>
