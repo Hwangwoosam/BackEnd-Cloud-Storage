@@ -80,8 +80,8 @@ public class UploadFileService {
         uploadFileRepository.save(metadataInsertDTO);
     }
 
-    public List<MetaDataDTO> getList(String userName){
-        return uploadFileRepository.getList(userName);
+    public List<MetaDataDTO> getList(String userName,int includeDir){
+        return uploadFileRepository.getList(userName,includeDir);
     }
 
     public MetaDataDTO get(int fileSeq){
