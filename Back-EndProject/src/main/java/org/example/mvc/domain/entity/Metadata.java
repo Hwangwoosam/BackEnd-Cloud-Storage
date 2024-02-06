@@ -16,5 +16,6 @@ public class Metadata {
     private int size;
     private String filePath;
     private String originalName;
+    private int includeDir;
     private Date createTime;
 }
