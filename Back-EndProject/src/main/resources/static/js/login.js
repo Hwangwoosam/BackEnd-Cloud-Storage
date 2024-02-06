@@ -1,5 +1,6 @@
 function login() {
     var userName = document.getElementById('userName').value;
+    var includeDir = 0;
 
     if (userName.trim() === "") {
         alert("사용자 이름을 입력하세요.");
@@ -17,8 +18,7 @@ function login() {
 
                 if (response.result === 'success') {
                     alert("로그인 성공!");
-                    postToGetList(userName);
-                    
+                    window.location.href = '/file/getList?userName=' + encodeURIComponent(userName);
                 } else {
                     alert("로그인 실패!");
                 }
@@ -29,23 +29,7 @@ function login() {
     };
 
     var data = JSON.stringify({
-        userName: userName
-    });
-
-    xhr.send(data);
-}
-
-function postToGetList(userName) {
-    var form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/file/getList';
-
-    var userNameInput = document.createElement('input');
-    userNameInput.type = 'hidden';
-    userNameInput.name = 'userName';
-    userNameInput.value = userName;
-
-    form.appendChild(userNameInput);
-    document.body.appendChild(form);
-    form.submit();
+            userName: userName
+        });
+        xhr.send(data);
 }
