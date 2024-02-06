@@ -48,13 +48,13 @@ public class UploadFileApiController {
             return ResponseEntity.ok(response);
         }
 
-        @GetMapping("/getList")
-        @ResponseBody
-        public ResponseEntity<List<MetaDataDTO>> getList(@PathVariable String userName){
-            logger.debug("api-getList : {}",userName);
-            List<MetaDataDTO> list = uploadFileService.getList(userName);
-            return new ResponseEntity<>(list, HttpStatus.OK);
-        }
+//        @GetMapping("/getList")
+//        @ResponseBody
+//        public ResponseEntity<List<MetaDataDTO>> getList(@PathVariable String userName){
+//            logger.debug("api-getList : {}",userName);
+//            List<MetaDataDTO> list = uploadFileService.getList(userName);
+//            return new ResponseEntity<>(list, HttpStatus.OK);
+//        }
 
         @PostMapping("/save")
         @Operation(summary = "업로드", description = "")

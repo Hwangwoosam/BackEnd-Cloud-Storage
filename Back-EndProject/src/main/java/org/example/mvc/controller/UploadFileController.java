@@ -56,8 +56,8 @@ public class UploadFileController {
     }
 
     @GetMapping(value = "/getList")
-    public String getList(@RequestParam String userName, Model model) {
-        List<MetaDataDTO> list = uploadFileService.getList(userName);
+    public String getList(@RequestParam String userName,@RequestParam(defaultValue = "0") int includeDir, Model model) {
+        List<MetaDataDTO> list = uploadFileService.getList(userName,includeDir);
 
         model.addAttribute("userName", userName);
         model.addAttribute("fileList",list);
