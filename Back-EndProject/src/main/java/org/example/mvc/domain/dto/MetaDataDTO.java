@@ -4,7 +4,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Getter
@@ -20,9 +22,20 @@ public class MetaDataDTO {
     private String originalName;
     private int includeDir;
     private Date createTime;
+    private List<MetaDataDTO> subFiles;
 
-    public MetaDataDTO(){
-
+    public MetaDataDTO(MetaDataDTO meta){
+        this.fileSeq = meta.getFileSeq();
+        this.userName = meta.getUserName();
+        this.thumbnailCheck =  meta.thumbnailCheck;
+        this.fileType =meta.getFileType();
+        this.fileSize = meta.getFileSize();
+        this.fileName = meta.getFileName();
+        this.filePath = meta.getFilePath();
+        this.originalName = meta.getOriginalName();
+        this.includeDir = meta.getIncludeDir();
+        this.createTime = meta.getCreateTime();
+        this.subFiles = new ArrayList<>();
     }
 
     public MetaDataDTO(int fileSeq, String userName, boolean thumbnailCheck,
@@ -38,5 +51,19 @@ public class MetaDataDTO {
         this.originalName = originalName;
         this.includeDir = includeDir;
         this.createTime = createTime;
+        this.subFiles = new ArrayList<>();
+    }
+
+    public List<MetaDataDTO> getList(){
+        List<MetaDataDTO> ret = new ArrayList<>(this.subFiles);
+        return ret;
+    }
+
+    public void add(MetaDataDTO elem){
+        this.subFiles.add(elem);
+    }
+
+    public void remove(MetaDataDTO elem){
+        this.subFiles.remove(elem);
     }
 }
