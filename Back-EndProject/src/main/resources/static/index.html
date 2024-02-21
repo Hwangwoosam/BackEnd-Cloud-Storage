@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <title>Login</title>
     <link rel="stylesheet" href="/css/login.css">
-    <script src="/js/login.js" defer></script>
 </head>
 <body>
-
-<form id="loginForm">
+<form id="loginForm" action="/file/getList" method="get" >
     <label for="userName">사용자 이름:</label>
     <input type="text" id="userName" name="userName" required>
-    <button type="button" onclick="login()">로그인</button>
+    <button type="submit">로그인</button>
 </form>
 
 </body>
