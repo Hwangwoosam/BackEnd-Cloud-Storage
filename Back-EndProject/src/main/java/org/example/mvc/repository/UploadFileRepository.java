@@ -15,7 +15,10 @@ public interface UploadFileRepository {
     void getFileInfo(MultipartFile multipartFile,String userName);
     void save(UploadFileDTO uploadFileParameter);
     List<MetaDataDTO> getList(@Param("userName") String userName,@Param("includeDir") int includeDir);
-    MetaDataDTO get(int fileSeq);
+    MetaDataDTO get(@Param("userName") String userName,@Param("fileSeq") int fileSeq);
+
+    void modifyFolderName(MetaDataDTO metadatauUpadteDTO);
+
     void delete(int fileSeq);
 
     ResponseEntity<byte[]> downloadFile(int fileSeq);

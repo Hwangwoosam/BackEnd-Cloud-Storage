@@ -1,5 +1,6 @@
 package org.example.mvc.service;
 
+import org.apache.ibatis.annotations.Param;
 import org.example.configuration.GlobalConfig;
 import org.example.configuration.exception.BaseException;
 import org.example.configuration.http.BaseResponseCode;
@@ -55,7 +56,7 @@ public class UploadFileService {
 
         String pathname = uploadFilePath + filename;
 
-        String originalFileName = checkDuplicateFileName(multipartFile.getOriginalFilename(),uploadFilePath,prefix);
+        String originalFileName = checkDuplicateFileName(multipartFile.getOriginalFilename(),prefix);
 
         try {
             UploadFileDTO parameter = new UploadFileDTO();
@@ -76,20 +77,58 @@ public class UploadFileService {
         }
 
     }
+
+    public void folderSave(String userName,String folderName){
+        String uploadFilePath = globalConfig.getUploadFilePath();
+        logger.debug("userName: {}",userName);
+        logger.debug("folderName: {}",folderName);
+        logger.debug("filePath: {}",uploadFilePath);
+        String originalFolder = UUID.randomUUID().toString();
+        try{
+            UploadFileDTO parameter = new UploadFileDTO();
+            parameter.setUserName(userName);
+            parameter.setFileType(true);
+            parameter.setSize(0);
+            parameter.setFileName(folderName);
+            parameter.setFilePath(uploadFilePath);
+            parameter.setOriginalName(originalFolder);
+            parameter.setThumbnailCheck(false);
+
+            save(parameter);
+
+            File folder = new File(uploadFilePath+originalFolder);
+            if(folder.exists()){
+                return;
+            }
+
+            if(!folder.mkdir()){
+                return;
+            }
+
+        }catch (IllegalStateException e){
+            logger.error("e",e);
+        }
+
+    }
+
     public void save(UploadFileDTO metadataInsertDTO){
         uploadFileRepository.save(metadataInsertDTO);
+    }
+
+    public void modifyFolderName(MetaDataDTO metadataUpdateDTO){
+        uploadFileRepository.modifyFolderName(metadataUpdateDTO);
     }
 
     public List<MetaDataDTO> getList(String userName,int includeDir){
         return uploadFileRepository.getList(userName,includeDir);
     }
 
-    public MetaDataDTO get(int fileSeq){
-        return uploadFileRepository.get(fileSeq);
+    public MetaDataDTO get(String userName,int fileSeq){
+        return uploadFileRepository.get(userName,fileSeq);
     }
 
-    public void delete(int fileSeq){
-        MetaDataDTO fileDTO = get(fileSeq);
+    public void delete(String userName, int fileSeq){
+        MetaDataDTO fileDTO = get(userName,fileSeq);
 
         String filePath = fileDTO.getFilePath() + fileDTO.getOriginalName();
 
@@ -109,8 +148,10 @@ public class UploadFileService {
         return Arrays.asList("jpg", "png", "jpeg", "gif").contains(extension.toLowerCase());
     }
 
-    public ResponseEntity<byte[]> downloadFile(int fileSeq) throws IOException {
-        MetaDataDTO fileInfo = get(fileSeq);
+    public ResponseEntity<byte[]> downloadFile(String userName,int fileSeq) throws IOException {
+        logger.debug("userName: {}",userName);
+        logger.debug("fileSeq: {}",fileSeq);
+        MetaDataDTO fileInfo = get(userName,fileSeq);
         String filePath = fileInfo.getFilePath() + fileInfo.getOriginalName();
         Path path = Paths.get(filePath);
 
@@ -124,30 +165,33 @@ public class UploadFileService {
         return new ResponseEntity<>(fileData, headers, HttpStatus.OK);
     }
 
-    public String checkDuplicateFileName(String fileName,String uploadFilePath,String prefix){
+    public String checkDuplicateFileName(String fileName,String prefix) {
+        logger.debug("checkDup: {}", fileName);
         List<String> fileNames = uploadFileRepository.checkFileName();
 
-        if(fileNames.isEmpty()) return fileName;
+        logger.debug("fileNames: {}", fileNames);
 
-        String result = "";
 
-        Pattern p = Pattern.compile("(.*)\\s\\(([0-9]+)\\)[.].*");
-        Matcher m = p.matcher(fileName);
+        String result = fileName;
 
-        if(m.find()){
-            int nextIdx = Integer.parseInt(m.group(2)) + 1;
-            result = m.group(1) + " (" + Integer.toString(nextIdx) + ")." + prefix;
-        }else{
-            String originalFileName = fileName.substring(0,fileName.lastIndexOf("."));
+        if (fileNames.contains(fileName)) {
+            Pattern p = Pattern.compile("(.*)\\s\\(([0-9]+)\\)[.].*");
+            Matcher m = p.matcher(fileName);
+
+            String originalFileName = fileName.substring(0, fileName.lastIndexOf("."));
+
+            if (m.find()) {
+                originalFileName = m.group(1);
+            }
+
             String dest = "";
-
-            for(int i = 1; i < Integer.MAX_VALUE; i++){
+            for (int i = 1; i < Integer.MAX_VALUE; i++) {
                 dest = String.format("%s (%d).%s", originalFileName, i, prefix);
-                if(!fileNames.contains(dest)) break;
+                logger.debug("dest: {}", dest);
+                if (!fileNames.contains(dest)) break;
             }
             result = dest;
         }
-
 
         return result;
     }
