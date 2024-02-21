@@ -1,43 +1,79 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const rows = document.querySelectorAll('tbody > tr');
+$(document).ready(function(){
 
-    rows.forEach(row => {
-        row.draggable = true;
-        row.addEventListener("dragstart", e => {
-            row.classList.add('dragging');
-            e.dataTransfer.setData('text/plain', row.id);
-        });
+  $(document).contextmenu(function(e){
+    var container = $(document); // 컨텍스트 메뉴를 표시할 영역에 대한 선택자
 
-        row.addEventListener('dragend', () => {
-            row.classList.remove('dragging')
-        });
+    var rows = container.find('.edrive-table-data-row');
+    var closestRow = findClosestRow(e.pageX, e.pageY, rows);
 
-    });
-});
+     if(closestRow != null){
+        var fileSeqVal = closestRow.attr('value');
+        var userNameVal = document.getElementById("contextMenu").getAttribute('value');
+        console.log(userNameVal);
+        var params ={
+            fileSeq: fileSeqVal,
+            userName: userNameVal
+        };
+        var queryString = Object.keys(params).map(function(key){
+            return key + '=' + params[key];
+        }).join('&');
 
-function getDragAfterElement(container, y) {
-         const draggableElements = [...container.querySelectorAll('.draggable:not(.dragging)')]
+        document.getElementById("delete").setAttribute('value',fileSeqVal);
+        document.getElementById("download").setAttribute('href','/file/download?' + queryString);
+        document.getElementById("move").setAttribute('href','/file/download/' + fileSeqVal);
+        document.getElementById("copy").setAttribute('href','/file/copy/' + fileSeqVal);
+     }
+    var winWidth = $(document).width();
+    var winHeight = $(document).height();
 
-         return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect() //해당 엘리먼트에 top값, height값 담겨져 있는 메소드를 호출해 box변수에 할당
-            const offset = y - box.top - box.height/2 //수직 좌표 - top값 - height값 / 2의 연산을 통해서 offset변수에 할당
-            if (offset < 0 && offset > closest.offset) { // (예외 처리) 0 이하 와, 음의 무한대 사이에 조건
-               return { offset: offset, element: child } // Element를 리턴
-            } else {
-               return closest
-            }
-         }, { offset: Number.NEGATIVE_INFINITY }).element
-      };
+    var posX = e.pageX;
+    var posY = e.pageY;
 
-const dropzone = document.querySelector('tbody');
-
-dropzone.addEventListener('dragover', e => {
-    e.preventDefault();
-    const afterElement = getDragAfterElement(dropzone, e.clientY);
-    const draggable = document.querySelector('.dragging');
-    if (afterElement == null) {
-    	dropzone.appendChild(draggable);
-    } else {
-    	dropzone.insertBefore(draggable, afterElement);
+    var menuWidth = $(".contextmenu").width();
+    var menuHeight = $(".contextmenu").height();
+    var secMargin = 10;
+    if(posX + menuWidth + secMargin >= winWidth
+    && posY + menuHeight + secMargin >= winHeight){
+      posLeft = posX - menuWidth - secMargin + "px";
+      posTop = posY - menuHeight - secMargin + "px";
     }
+    else if(posX + menuWidth + secMargin >= winWidth){
+      posLeft = posX - menuWidth - secMargin + "px";
+      posTop = posY + secMargin + "px";
+    }
+    else if(posY + menuHeight + secMargin >= winHeight){
+      posLeft = posX + secMargin + "px";
+      posTop = posY - menuHeight - secMargin + "px";
+    }
+    else {
+      posLeft = posX + secMargin + "px";
+      posTop = posY + secMargin + "px";
+    };
+    $(".contextmenu").css({
+      "left": posLeft,
+      "top": posTop
+    }).show();
+
+    return false;
+  });
+
+  $(document).click(function(){
+    $(".contextmenu").hide();
+  });
+
+  function findClosestRow(mouseX, mouseY, rows) {
+      var closestRow = null;
+
+      rows.each(function() {
+        var row = $(this);
+        var rect = this.getBoundingClientRect();
+        var width = rect.left + rect.width;
+        var height = rect.top + rect.height;
+        if(rect.left <= mouseX && mouseX <= width && rect.top <= mouseY && mouseY <= height){
+            closestRow = row;
+        }
+      });
+
+      return closestRow;
+  }
 });

@@ -1,115 +1,95 @@
-<!DOCTYPE html>
 <html xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
-    <title>파일목록</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/file_list.css">
-    <link rel="stylesheet" href="/css/dragableTable.css">
+    <link rel="stylesheet" href="/css/contextMenu.css">
 </head>
 <body>
 
-<div class="mb-5 d-flex flex-column justify-content-end">
-    <div>
-        <a class="btn btn-info text-white" href="/">메인</a>
+<div class="row admin-sub-header">
+    <div class="col-md-8 col-sm-8 col-8 site-breadcrumb">
+        <div id="wrap">
+            <span id="main-module-name">Cloud Storage</span>
+            </span>
+        </div>
     </div>
-    <p>사용자: <span th:text="${userName}">Null</span></p>
+    <div class="col-md-4 col-sm-4 col-4 text-right">
+        <button class="btn btn-primary btn-sm pl-3 pr-3"> + New File</button>
+        <button class="btn btn-primary btn-sm pl-3 pr-3"> + New Folder</button>
+    </div>
 </div>
 
-<section class="notice">
-    <div class="page-title">
-        <div class="container">
-            <h3>파일업로드 리스트</h3>
-        </div>
-    </div>
-
-    <!-- board seach area -->
-    <div id="board-search">
-        <div class="container">
-            <div class="search-window">
-                <form action="">
-                    <div class="search-wrap">
-                        <label for="search" class="blind">공지사항 내용 검색</label>
-                        <input id="search" type="search" name="" placeholder="검색어를 입력해주세요." value="">
-                        <button type="submit" class="btn btn-dark">검색</button>
-                    </div>
-                </form>
-            </div>
-            <div>
-                <form id="uploadForm" action="/file/save" enctype="multipart/form-data" method="post">
-                    <input type="hidden" name="userName" th:value="${userName}"/>
-                    <input type="file" name="uploadFile" id="uploadFile" th:value="${multipartFile}"/>
-                    <button type="submit">파일업로드</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- board list area -->
-    <div id="board-list">
-        <div class="container">
-            <table class="board-table">
-                <thead>
-                <tr>
-                    <th colspan="8">
-                        <div id="displayCount" class="d-flex justify-content-end"></div>
-                    </th>
-                </tr>
-                </thead>
-                <thead>
-                <tr>
-                    <th scope="col">번호</th>
-                    <th scope="col">썸네일</th>
-                    <th scope="col">파일이름</th>
-                    <th scope="col">파일크기</th>
-                    <th scope="col">파일경로</th>
-                    <th scope="col">생성날짜</th>
-                    <th scope="col">삭제</th>
-                    <th scope="col">다운로드</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:if = "${fileList.isEmpty()}">
-                    <td class="text-center" colspan="8">등록된 데이터가 없습니다.</td>
-                </tr>
-                <div th:if="${not fileList.isEmpty()}">
-                    <tr th:each="fileInfo : ${fileList}" th:id="${fileInfo.fileSeq}" class="draggable">
-
-                            <td th:text="${fileInfo.fileSeq}"></td>
-                            <td th:if="${fileInfo.thumbnailCheck}">
-                                <img th:src="${fileInfo.originalName}">
-                            </td>
-                            <td th:if="${!fileInfo.thumbnailCheck}">X</td>
-                            <td th:text="${fileInfo.fileName}"></td>
-                            <td th:text="${fileInfo.fileSize}"></td>
-                            <td th:text="${fileInfo.filePath}"></td>
-                            <td th:text="${fileInfo.createTime}"></td>
-                            <td th:if="${#strings.equals(userName, fileInfo.userName)}">
-                                <form method="post" th:action="'/file/delete/' + *{fileInfo.fileSeq}">
-                                    <input type="hidden" name="userName" th:value="${fileInfo.userName}"/>
-                                    <input type="hidden" name="fileSeq" th:value="${fileInfo.fileSeq}"/>
-                                    <button type="submit">삭제</button>
-                                </form>
-                            </td>
-                            <td th:unless="${#strings.equals(userName, fileInfo.userName)}">X</td>
-                            <td th:if="${#strings.equals(userName, fileInfo.userName)}">
-                                <form method="get" th:action="'/file/download/' + ${fileInfo.fileSeq}">
-                                    <button type="submit">다운로드</button>
-                                </form>
-                            </td>
-                            <td th:unless="${#strings.equals(userName, fileInfo.userName)}">X</td>
-                    </tr>
+<div class="row edrive-wrapper">
+    <div class="col-lg-2 col-md-3 col-sm-4 col-12 edrive-sidebar">
+        <div class="edrive-size-info">35MB of 500MB Used</div>
+        <ul class="main-list-box">
+            <li>
+                <div style="padding-left: 1em;">
+                    <i class="fas fa-caret-down"></i>
+                    <a th:href="@{/file/getList(userName=${userName}, includeDir=0)}"><b>Drive</b></a>
                 </div>
-
-                </tbody>
-            </table>
-            <ul id="pagingul">
-            </ul>
-        </div>
+                <div th:if = "${sideList.isEmpty()}">등록된 데이터가 없습니다.</div>
+                <div th:if = "${not sideList.isEmpty()}">
+                    <th:block th:fragment="file-tree" th:remove="tag">
+                        <ul class="sub-list-box">
+                            <li th:each="fileInfo : ${sideList}" th:id="${fileInfo.fileSeq}" th:value="${fileInfo.fileType}">
+                                <div style="padding-left: 2em;" th:if="${fileInfo.fileType == 0}">
+                                    <i class="fas fa-caret-donw"></i>
+                                    <a href="" th:text="${fileInfo.fileName}"></a>
+                                </div>
+                                <ul th:if="${not fileInfo.subFiles.isEmpty()}" class="sub-list-box">
+                                    <div style="padding-left: 2em;" >
+                                        <i class="fas fa-caret-down"></i>
+                                        <a th:href="@{/file/getList(userName=${userName}, includeDir=${fileInfo.fileSeq})}" th:text="${fileInfo.fileName}"></a>
+                                        <th:block th:with="sideList = ${fileInfo.subFiles}" th:insert="~{this :: file-tree}" th:remove="tag"></th:block>
+                                    </div>
+                                </ul>
+                            </li>
+                        </ul>
+                    </th:block>
+                </div>
+            </li>
+        </ul>
 
     </div>
+    <div class="col-lg-10 col-md-9 col-sm-8 col-12 edrive-space">
+        <div class="row edrive-table-head">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-12">Name</div>
+            <div class="col-lg-2 col-md-3 col-sm-3 col-12">Date Modified</div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-12">Type</div>
+            <div class="col-lg-1 col-md-1 col-sm-1 col-12">Size</div>
+        </div>
+        <div th:if = "${sideList.isEmpty()}">등록된 데이터가 없습니다.</div>
+        <div th:if = "${not curList.isEmpty()}">
+            <div th:each="fileInfo, iterStat : ${curList}" class="row edrive-table-data-row" th:value="${fileInfo.fileSeq}" th:id="'fileInfoElement_' + ${iterStat.index}">
 
-</section>
+                <div th:if ="${fileInfo.fileType == 1}" class="col-lg-3 col-md-3 col-sm-3 col-12 data-name"><i class="fas fa-folder edrive-file-icon"></i>
+                    <a th:href="@{/file/getList(userName=${userName}, includeDir=${fileInfo.fileSeq})}" th:text="${fileInfo.fileName}"></a>
+                </div>
+                <div th:if ="${fileInfo.fileType == 0}" class="col-lg-3 col-md-3 col-sm-3 col-12 data-name"><i class="fas fa-file edrive-file-icon"></i>
+                    <a href="" th:text="${fileInfo.fileName}"></a>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-3 col-12 data-info" th:text="${fileInfo.createTime}"></div>
+                <div th:if ="${fileInfo.fileType == 1}" class="col-lg-2 col-md-2 col-sm-2 col-12 data-info">Folder</div>
+                <div th:if ="${fileInfo.fileType == 0}" class="col-lg-2 col-md-2 col-sm-2 col-12 data-info">File</div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-12 data-info" th:text="${fileInfo.fileSize}"></div>
+                <div class="col-lg-4 col-md-3 col-sm-3 col-12 data-info"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ul th:id="contextMenu" class="contextmenu" th:value="${userName}" >
+    <li><a th:id="delete" href="#">삭제</a></li>
+    <li><a th:id="download" href="#">다운로드</a></li>
+    <li><a th:id="move" href="#">이동</a></li>
+    <li><a th:id="copy" href="#">복사</a></li>
+</ul>
+
+<script type = "text/javascript" src="/js/file_list.js"></script>
 </body>
-<script src="/js/file_list.js"></script>
 </html>
-
