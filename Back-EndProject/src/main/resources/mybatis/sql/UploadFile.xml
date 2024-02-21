@@ -77,5 +77,6 @@
         SELECT
             UF.fileName
         FROM metadata UF
+        WHERE includeDir = #{includeDir}
     </select>
 </mapper>
