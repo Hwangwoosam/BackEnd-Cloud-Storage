@@ -13,7 +13,7 @@ public class Metadata {
     private String fileName;
     private boolean fileType;
     private boolean thumbnailCheck;
-    private int size;
+    private int fileSize;
     private String filePath;
     private String originalName;
     private int includeDir;
