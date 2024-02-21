@@ -14,7 +14,10 @@
             UF.includeDir,
             UF.createTime
         FROM metadata UF
-        WHERE UF.userName = #{userName} and UF.includeDir = #{includeDir}
+        WHERE UF.userName = #{userName}
+        <if test="includeDir != -1">
+            and UF.includeDir = #{includeDir}
+        </if>
     </select>
 
     <select id="get" resultType="org.example.mvc.domain.dto.MetaDataDTO">
@@ -22,13 +25,15 @@
             UF.fileSeq,
             UF.userName,
             UF.thumbnailCheck,
+            UF.fileType,
             UF.fileSize,
             UF.fileName,
             UF.filePath,
             UF.originalName,
+            UF.includeDir,
             UF.createTime
         FROM metadata UF
-        WHERE UF.fileSeq = #{fileSeq}
+        WHERE UF.userName = #{userName} and UF.fileSeq = #{fileSeq}
     </select>
 
     <insert id="save" parameterType="org.example.mvc.domain.dto.UploadFileDTO">
@@ -57,6 +62,11 @@
             NOW()
         )
     </insert>
+
+    <update id="modifyFolderName" parameterType="org.example.mvc.domain.dto.MetaDataDTO">
+        UPDATE metadata SET fileName = #{fileName}
+        WHERE userName = #{userName} and fileSeq = #{fileSeq}
+    </update>
 
     <delete id="delete" parameterType="int">
         DELETE FROM metadata
