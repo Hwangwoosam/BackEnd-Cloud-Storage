@@ -1,5 +1,8 @@
 package org.example.mvc.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameters;
+import org.apache.commons.collections4.Predicate;
 import org.example.configuration.GlobalConfig;
 import org.example.configuration.exception.BaseException;
 import org.example.configuration.http.BaseResponseCode;
@@ -13,14 +16,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
 @RequestMapping("/file")
@@ -56,22 +58,52 @@ public class UploadFileController {
     }
 
     @GetMapping(value = "/getList")
-    public String getList(@RequestParam String userName,@RequestParam(defaultValue = "0") int includeDir, Model model) {
-        List<MetaDataDTO> list = uploadFileService.getList(userName,includeDir);
+    public String demo(@RequestParam(defaultValue = "ㅁㄴㅇ") String userName,@RequestParam(defaultValue = "0") int includeDir, Model model){
+        List<MetaDataDTO> list = uploadFileService.getList(userName,-1);
+        List<MetaDataDTO> curList = uploadFileService.getList(userName,includeDir);
 
+        List<MetaDataDTO> sideList = new ArrayList<>();
+        List<Integer> check = new ArrayList<>();
+
+        for(MetaDataDTO meta : list){
+                if(check.contains(meta.getFileSeq())) continue;
+                Collection<MetaDataDTO> c = CollectionUtils.select(list, new Predicate<MetaDataDTO>() {
+                    @Override
+                    public boolean evaluate(MetaDataDTO object) {
+                        return object.getIncludeDir() == meta.getFileSeq();
+                    }
+                });
+
+                if(!c.isEmpty()){
+                    MetaDataDTO tmp = new MetaDataDTO(meta);
+                    int size = meta.getFileSize();
+                    for(MetaDataDTO sub : c){
+                        check.add(sub.getFileSeq());
+                        size += sub.getFileSize();
+                        meta.getSubFiles().add(sub);
+                    }
+                    sideList.add(meta);
+                }else{
+                    sideList.add(meta);
+                }
+        }
+        model.addAttribute("curDir",includeDir);
         model.addAttribute("userName", userName);
-        model.addAttribute("fileList",list);
+        model.addAttribute("sideList",sideList);
+        model.addAttribute("curList",curList);
         return "uploadFile/file_list.html";
     }
 
-    @PostMapping("/delete/{fileSeq}")
-    public String delete(@RequestParam int fileSeq,@RequestParam String userName){
-        logger.debug("delete : {}",fileSeq);
-        if(fileSeq < 0){
-            throw new BaseException(BaseResponseCode.VALIDATE_REQUIRED,new String[]{"파일 번호"});
-        }
+    @PostMapping("/createFolder")
+    @Operation(summary = "폴더 생성", description = "폴더 생성 API")
+    @Parameters
+    public String createFolder(@RequestParam("folderName") String folderName, @RequestParam("userName") String userName){
+//        String userName = queryParameterMap.get("userName");
+//        String folderName = queryParameterMap.get("folderName");
+//        int dirNumber = Integer.parseInt(queryParameterMap.get("includeDir"));
 
-        uploadFileService.delete(fileSeq);
+        uploadFileService.folderSave(userName,folderName);
+
         String encodedUserName;
         try {
             encodedUserName = URLEncoder.encode(userName, "UTF-8");
@@ -82,13 +114,33 @@ public class UploadFileController {
         return "redirect:/file/getList?userName=" + encodedUserName;
     }
 
-    @GetMapping("/download/{fileSeq}")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable int fileSeq) throws IOException {
+    @PostMapping("/delete/{fileSeq}")
+    public String delete(@RequestParam int fileSeq,@RequestParam String userName){
+        logger.debug("delete : {}",fileSeq);
         if(fileSeq < 0){
             throw new BaseException(BaseResponseCode.VALIDATE_REQUIRED,new String[]{"파일 번호"});
         }
 
-        return uploadFileService.downloadFile(fileSeq);
+        uploadFileService.delete(userName,fileSeq);
+        String encodedUserName;
+        try {
+            encodedUserName = URLEncoder.encode(userName, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Error encoding userName", e);
+        }
+
+        return "redirect:/file/getList?userName=" + encodedUserName;
+    }
+
+    @GetMapping("/download")
+    public ResponseEntity<byte[]> downloadFile(@RequestParam("fileSeq") int fileSeq,@RequestParam("userName") String userName) throws IOException {
+
+        logger.debug("download: {}",fileSeq + " " + userName);
+        if(fileSeq < 0){
+            throw new BaseException(BaseResponseCode.VALIDATE_REQUIRED,new String[]{"파일 번호"});
+        }
+
+        return uploadFileService.downloadFile(userName,fileSeq);
     }
 
 }
