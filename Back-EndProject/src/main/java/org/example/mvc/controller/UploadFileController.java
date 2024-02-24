@@ -7,6 +7,8 @@ import org.example.configuration.GlobalConfig;
 import org.example.configuration.exception.BaseException;
 import org.example.configuration.http.BaseResponseCode;
 import org.example.mvc.domain.dto.MetaDataDTO;
+import org.example.mvc.domain.dto.UploadUserDTO;
+import org.example.mvc.domain.dto.UserInfoDTO;
 import org.example.mvc.service.UploadFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +36,36 @@ public class UploadFileController {
     @Autowired
     private UploadFileService uploadFileService;
 
+    @GetMapping("/login")
+    public String login(@RequestParam("userName") String userName){
+        logger.debug("login: {}",userName);
+        if(userName.isEmpty()){
+            throw new BaseException(BaseResponseCode.DATA_IS_NULL, new String[]{"사용자 이름"});
+        }
+
+        UserInfoDTO userInfoDTO = uploadFileService.getUser(userName);
+        if(userInfoDTO == null){
+            String uploadPath = globalConfig.getUploadFilePath();
+            String folderPath = UUID.randomUUID().toString();
+            File folder = new File(uploadPath + folderPath);
+            if(!folder.mkdir()){
+                throw new BaseException(BaseResponseCode.ERROR);
+            }
+            uploadFileService.setUser(new UploadUserDTO(userName,uploadPath + folderPath));
+            userInfoDTO = uploadFileService.getUser(userName);
+        }
+        String encodedName;
+        try {
+            encodedName = URLEncoder.encode(userInfoDTO.getUserName(),"UTF-8");
+        }catch (UnsupportedEncodingException e){
+            throw new RuntimeException("Error encoding userName", e);
+        }
+
+        return "redirect:/file/getList?userName="+encodedName + "&includeDir=0";
+    }
     @PostMapping("/save")
-    public String save(@RequestParam("uploadFile") MultipartFile multipartFile, @RequestParam("userName") String userName, Model model) throws IOException{
+    public String save(@RequestParam("uploadFile") MultipartFile multipartFile, @RequestParam("userName") String userName,
+                       @RequestParam("includeDir") int includeDir,Model model) throws IOException{
         if(multipartFile == null || multipartFile.isEmpty()){
             throw new BaseException(BaseResponseCode.DATA_IS_NULL, new String[]{"업로드 파일"});
         }
@@ -45,6 +75,7 @@ public class UploadFileController {
         }
 
         logger.debug("save : {}",userName);
+        logger.debug("save-includeDir: {}",includeDir);
 
         String encodedUserName;
         try {
@@ -53,14 +84,18 @@ public class UploadFileController {
             throw new RuntimeException("Error encoding userName", e);
         }
 
-        uploadFileService.fileSave(multipartFile,userName);
-        return "redirect:/file/getList?userName=" + encodedUserName;
+        model.addAttribute("userName",userName);
+        model.addAttribute("includeDir",includeDir);
+        uploadFileService.fileSave(multipartFile,userName,includeDir);
+        return "redirect:/file/getList?userName=" + encodedUserName + "&includeDir=" + includeDir;
     }
 
     @GetMapping(value = "/getList")
-    public String demo(@RequestParam(defaultValue = "ㅁㄴㅇ") String userName,@RequestParam(defaultValue = "0") int includeDir, Model model){
+    public String demo(@RequestParam String userName,@RequestParam(defaultValue = "0") int includeDir, Model model){
         List<MetaDataDTO> list = uploadFileService.getList(userName,-1);
         List<MetaDataDTO> curList = uploadFileService.getList(userName,includeDir);
+
+        logger.debug("getList-include: {}",includeDir);
 
         List<MetaDataDTO> sideList = new ArrayList<>();
         List<Integer> check = new ArrayList<>();
@@ -87,7 +122,7 @@ public class UploadFileController {
                     sideList.add(meta);
                 }
         }
-        model.addAttribute("curDir",includeDir);
+        model.addAttribute("includeDir",includeDir);
         model.addAttribute("userName", userName);
         model.addAttribute("sideList",sideList);
         model.addAttribute("curList",curList);
@@ -97,12 +132,9 @@ public class UploadFileController {
     @PostMapping("/createFolder")
     @Operation(summary = "폴더 생성", description = "폴더 생성 API")
     @Parameters
-    public String createFolder(@RequestParam("folderName") String folderName, @RequestParam("userName") String userName){
-//        String userName = queryParameterMap.get("userName");
-//        String folderName = queryParameterMap.get("folderName");
-//        int dirNumber = Integer.parseInt(queryParameterMap.get("includeDir"));
-
-        uploadFileService.folderSave(userName,folderName);
+    public String createFolder(@RequestParam("folderName") String folderName, @RequestParam("userName") String userName,
+                               @RequestParam("includeDir") int includeDir,Model model){
+        uploadFileService.folderSave(userName,folderName,includeDir);
 
         String encodedUserName;
         try {
@@ -110,12 +142,14 @@ public class UploadFileController {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("Error encoding userName", e);
         }
+        model.addAttribute("userName",userName);
+        model.addAttribute("includeDir",includeDir);
 
-        return "redirect:/file/getList?userName=" + encodedUserName;
+        return "redirect:/file/getList?userName=" + encodedUserName + "&includeDir=" + includeDir;
     }
 
     @PostMapping("/delete/{fileSeq}")
-    public String delete(@RequestParam int fileSeq,@RequestParam String userName){
+    public String delete(@RequestParam int fileSeq,@RequestParam String userName,@RequestParam int includeDir,Model model){
         logger.debug("delete : {}",fileSeq);
         if(fileSeq < 0){
             throw new BaseException(BaseResponseCode.VALIDATE_REQUIRED,new String[]{"파일 번호"});
@@ -129,7 +163,10 @@ public class UploadFileController {
             throw new RuntimeException("Error encoding userName", e);
         }
 
-        return "redirect:/file/getList?userName=" + encodedUserName;
+        model.addAttribute("userName",userName);
+        model.addAttribute("includeDir",includeDir);
+
+        return "redirect:/file/getList?userName=" + encodedUserName +"&includeDir=" + includeDir;
     }
 
     @GetMapping("/download")
