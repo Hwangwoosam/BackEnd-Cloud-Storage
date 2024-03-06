@@ -36,33 +36,6 @@ public class UploadFileController {
     @Autowired
     private UploadFileService uploadFileService;
 
-    @GetMapping("/login")
-    public String login(@RequestParam("userName") String userName){
-        logger.debug("login: {}",userName);
-        if(userName.isEmpty()){
-            throw new BaseException(BaseResponseCode.DATA_IS_NULL, new String[]{"사용자 이름"});
-        }
-
-        UserInfoDTO userInfoDTO = uploadFileService.getUser(userName);
-        if(userInfoDTO == null){
-            String uploadPath = globalConfig.getUploadFilePath();
-            String folderPath = UUID.randomUUID().toString();
-            File folder = new File(uploadPath + folderPath);
-            if(!folder.mkdir()){
-                throw new BaseException(BaseResponseCode.ERROR);
-            }
-            uploadFileService.setUser(new UploadUserDTO(userName,uploadPath + folderPath));
-            userInfoDTO = uploadFileService.getUser(userName);
-        }
-        String encodedName;
-        try {
-            encodedName = URLEncoder.encode(userInfoDTO.getUserName(),"UTF-8");
-        }catch (UnsupportedEncodingException e){
-            throw new RuntimeException("Error encoding userName", e);
-        }
-
-        return "redirect:/file/getList?userName="+encodedName + "&includeDir=0";
-    }
     @PostMapping("/save")
     public String save(@RequestParam("uploadFile") MultipartFile multipartFile, @RequestParam("userName") String userName,
                        @RequestParam("includeDir") int includeDir,Model model) throws IOException{
@@ -101,6 +74,8 @@ public class UploadFileController {
         List<Integer> check = new ArrayList<>();
 
         for(MetaDataDTO meta : list){
+
+
                 if(check.contains(meta.getFileSeq())) continue;
                 Collection<MetaDataDTO> c = CollectionUtils.select(list, new Predicate<MetaDataDTO>() {
                     @Override
@@ -109,11 +84,14 @@ public class UploadFileController {
                     }
                 });
 
+
                 if(!c.isEmpty()){
                     MetaDataDTO tmp = new MetaDataDTO(meta);
                     int size = meta.getFileSize();
                     for(MetaDataDTO sub : c){
-                        check.add(sub.getFileSeq());
+                        if(sub.getFileType() == 0) {
+                            check.add(sub.getFileSeq());
+                        }
                         size += sub.getFileSize();
                         meta.getSubFiles().add(sub);
                     }
