@@ -15,7 +15,6 @@ public class Metadata {
     private boolean thumbnailCheck;
     private int fileSize;
     private String filePath;
-    private String originalName;
     private int includeDir;
     private Date createTime;
 }

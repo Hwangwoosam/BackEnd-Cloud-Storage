@@ -36,7 +36,7 @@ public class UploadFileController {
     @Autowired
     private UploadFileService uploadFileService;
 
-    @PostMapping("/save")
+    @PostMapping("/uploadFile")
     public String save(@RequestParam("uploadFile") MultipartFile multipartFile, @RequestParam("userName") String userName,
                        @RequestParam("includeDir") int includeDir,Model model) throws IOException{
         if(multipartFile == null || multipartFile.isEmpty()){

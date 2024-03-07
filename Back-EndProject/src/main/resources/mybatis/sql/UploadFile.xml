@@ -10,7 +10,6 @@
             UF.fileSize,
             UF.fileName,
             UF.filePath,
-            UF.originalName,
             UF.includeDir,
             UF.createTime
         FROM metadata UF
@@ -19,6 +18,28 @@
             and UF.includeDir = #{includeDir}
         </if>
     </select>
+
+    <select id="getUser" resultType="org.example.mvc.domain.dto.UserInfoDTO">
+        SELECT
+            userId,
+            userName,
+            folderPath
+        FROM userinfo
+        WHERE userName = #{userName}
+    </select>
+
+    <insert id="setUser" parameterType="org.example.mvc.domain.dto.UploadUserDTO">
+        INSERT INTO userinfo
+        (
+            userName,
+            folderPath
+        )
+        VALUES
+        (
+            #{userName},
+            #{folderPath}
+        )
+    </insert>
 
     <select id="get" resultType="org.example.mvc.domain.dto.MetaDataDTO">
         SELECT
@@ -29,7 +50,6 @@
             UF.fileSize,
             UF.fileName,
             UF.filePath,
-            UF.originalName,
             UF.includeDir,
             UF.createTime
         FROM metadata UF
@@ -45,7 +65,6 @@
             fileName,
             thumbnailCheck,
             filePath,
-            originalName,
             includeDir,
             createTime
         )
@@ -57,7 +76,6 @@
             #{fileName},
             #{thumbnailCheck},
             #{filePath},
-            #{originalName},
             #{includeDir},
             NOW()
         )
@@ -68,9 +86,13 @@
         WHERE userName = #{userName} and fileSeq = #{fileSeq}
     </update>
 
-    <delete id="delete" parameterType="int">
+    <delete id="delete" parameterType="java.util.List">
         DELETE FROM metadata
-        WHERE fileSeq = #{fileSeq}
+        WHERE fileSeq IN (
+        <foreach collection="list" item="tmp" separator=",">
+            #{tmp}
+        </foreach>
+        )
     </delete>
 
     <select id="checkFileName" resultType="String">

@@ -19,7 +19,6 @@ public class MetaDataDTO {
     private int fileSize;
     private String fileName;
     private String filePath;
-    private String originalName;
     private int includeDir;
     private Date createTime;
     private List<MetaDataDTO> subFiles;
@@ -32,7 +31,6 @@ public class MetaDataDTO {
         this.fileSize = meta.getFileSize();
         this.fileName = meta.getFileName();
         this.filePath = meta.getFilePath();
-        this.originalName = meta.getOriginalName();
         this.includeDir = meta.getIncludeDir();
         this.createTime = meta.getCreateTime();
         this.subFiles = new ArrayList<>();
@@ -40,7 +38,7 @@ public class MetaDataDTO {
 
     public MetaDataDTO(int fileSeq, String userName, boolean thumbnailCheck,
                        int fileType, int size, String fileName, String filePath,
-                       String originalName, int includeDir,Date createTime){
+                       int includeDir,Date createTime){
         this.fileSeq = fileSeq;
         this.userName = userName;
         this.thumbnailCheck = thumbnailCheck;
@@ -48,7 +46,6 @@ public class MetaDataDTO {
         this.fileSize = size;
         this.fileName = fileName;
         this.filePath = filePath;
-        this.originalName = originalName;
         this.includeDir = includeDir;
         this.createTime = createTime;
         this.subFiles = new ArrayList<>();
