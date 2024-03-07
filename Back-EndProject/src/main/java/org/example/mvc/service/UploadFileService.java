@@ -114,7 +114,7 @@ public class UploadFileService {
 
     public void delete(String userName, int fileSeq){
         MetaDataDTO fileDTO = get(userName,fileSeq);
-        String filePath = fileDTO.getFilePath() + fileDTO.getFileName();
+        String filePath = fileDTO.getFilePath() + "/" + fileDTO.getFileName();
         List<Integer> fileSeqs = new ArrayList<>();
         fileSeqs.add(fileSeq);
 
@@ -125,7 +125,7 @@ public class UploadFileService {
                     delete(userName,subFile.getFileSeq());
                 }else {
                     fileSeqs.add(subFile.getFileSeq());
-                    String subFilePath = subFile.getFilePath() + subFile.getFileName();
+                    String subFilePath = subFile.getFilePath() + "/" +subFile.getFileName();
                     File file = new File(subFilePath);
                     if (!file.exists()) {
                         throw new BaseException(BaseResponseCode.UPLOAD_FILE_IS_NULL);
