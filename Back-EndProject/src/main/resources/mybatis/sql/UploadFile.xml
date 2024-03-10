@@ -19,28 +19,6 @@
         </if>
     </select>
 
-    <select id="getUser" resultType="org.example.mvc.domain.dto.UserInfoDTO">
-        SELECT
-            userId,
-            userName,
-            folderPath
-        FROM userinfo
-        WHERE userName = #{userName}
-    </select>
-
-    <insert id="setUser" parameterType="org.example.mvc.domain.dto.UploadUserDTO">
-        INSERT INTO userinfo
-        (
-            userName,
-            folderPath
-        )
-        VALUES
-        (
-            #{userName},
-            #{folderPath}
-        )
-    </insert>
-
     <select id="get" resultType="org.example.mvc.domain.dto.MetaDataDTO">
         SELECT
             UF.fileSeq,
