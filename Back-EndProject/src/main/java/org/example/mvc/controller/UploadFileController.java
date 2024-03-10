@@ -47,59 +47,25 @@ public class UploadFileController {
             throw new BaseException(BaseResponseCode.DATA_IS_NULL, new String[]{"사용자 이름"});
         }
 
+        model.addAttribute("userName",userName);
+        model.addAttribute("includeDir",includeDir);
+
         logger.debug("save : {}",userName);
         logger.debug("save-includeDir: {}",includeDir);
 
-        String encodedUserName;
-        try {
-            encodedUserName = URLEncoder.encode(userName, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Error encoding userName", e);
-        }
-
-        model.addAttribute("userName",userName);
-        model.addAttribute("includeDir",includeDir);
         uploadFileService.fileSave(multipartFile,userName,includeDir);
+
+        String encodedUserName = uploadFileService.encoding(userName);
         return "redirect:/file/getList?userName=" + encodedUserName + "&includeDir=" + includeDir;
     }
 
     @GetMapping(value = "/getList")
     public String demo(@RequestParam String userName,@RequestParam(defaultValue = "0") int includeDir, Model model){
-        List<MetaDataDTO> list = uploadFileService.getList(userName,-1);
         List<MetaDataDTO> curList = uploadFileService.getList(userName,includeDir);
+        List<MetaDataDTO> sideList = uploadFileService.getFolderStruct(userName,includeDir);
 
         logger.debug("getList-include: {}",includeDir);
 
-        List<MetaDataDTO> sideList = new ArrayList<>();
-        List<Integer> check = new ArrayList<>();
-
-        for(MetaDataDTO meta : list){
-
-
-                if(check.contains(meta.getFileSeq())) continue;
-                Collection<MetaDataDTO> c = CollectionUtils.select(list, new Predicate<MetaDataDTO>() {
-                    @Override
-                    public boolean evaluate(MetaDataDTO object) {
-                        return object.getIncludeDir() == meta.getFileSeq();
-                    }
-                });
-
-
-                if(!c.isEmpty()){
-                    MetaDataDTO tmp = new MetaDataDTO(meta);
-                    int size = meta.getFileSize();
-                    for(MetaDataDTO sub : c){
-                        if(sub.getFileType() == 0) {
-                            check.add(sub.getFileSeq());
-                        }
-                        size += sub.getFileSize();
-                        meta.getSubFiles().add(sub);
-                    }
-                    sideList.add(meta);
-                }else{
-                    sideList.add(meta);
-                }
-        }
         model.addAttribute("includeDir",includeDir);
         model.addAttribute("userName", userName);
         model.addAttribute("sideList",sideList);
@@ -112,6 +78,11 @@ public class UploadFileController {
     @Parameters
     public String createFolder(@RequestParam("folderName") String folderName, @RequestParam("userName") String userName,
                                @RequestParam("includeDir") int includeDir,Model model){
+
+        if(folderName.isEmpty()){
+            throw new BaseException(BaseResponseCode.DATA_IS_NULL, new String[]{"폴더 이름"});
+        }
+
         uploadFileService.folderSave(userName,folderName,includeDir);
 
         String encodedUserName;

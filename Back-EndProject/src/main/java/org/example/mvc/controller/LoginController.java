@@ -5,7 +5,9 @@ import org.example.configuration.exception.BaseException;
 import org.example.configuration.http.BaseResponseCode;
 import org.example.mvc.domain.dto.UploadUserDTO;
 import org.example.mvc.domain.dto.UserInfoDTO;
+import org.example.mvc.repository.UserRepository;
 import org.example.mvc.service.UploadFileService;
+import org.example.mvc.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,7 @@ public class LoginController {
     @Autowired
     private GlobalConfig globalConfig;
     @Autowired
-    private UploadFileService uploadFileService;
+    private UserService userService;
 
     @GetMapping("/login")
     public String login(@RequestParam("userName") String userName){
@@ -36,7 +38,7 @@ public class LoginController {
             throw new BaseException(BaseResponseCode.DATA_IS_NULL, new String[]{"사용자 이름"});
         }
 
-        UserInfoDTO userInfoDTO = uploadFileService.getUser(userName);
+        UserInfoDTO userInfoDTO = userService.getUser(userName);
         if(userInfoDTO == null){
             String uploadPath = globalConfig.getUploadFilePath();
             String folderPath = UUID.randomUUID().toString();
@@ -44,8 +46,8 @@ public class LoginController {
             if(!folder.mkdir()){
                 throw new BaseException(BaseResponseCode.ERROR);
             }
-            uploadFileService.setUser(new UploadUserDTO(userName,uploadPath + folderPath));
-            userInfoDTO = uploadFileService.getUser(userName);
+            userService.setUser(new UploadUserDTO(userName,uploadPath + folderPath));
+            userInfoDTO = userService.getUser(userName);
         }
         String encodedName;
         try {

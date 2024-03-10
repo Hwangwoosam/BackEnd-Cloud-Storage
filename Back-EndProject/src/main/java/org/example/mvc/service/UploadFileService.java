@@ -1,5 +1,7 @@
 package org.example.mvc.service;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
 import org.apache.ibatis.annotations.Param;
 import org.example.configuration.GlobalConfig;
 import org.example.configuration.exception.BaseException;
@@ -21,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,14 +42,6 @@ public class UploadFileService {
     private UploadFileRepository uploadFileRepository;
 
     Logger logger = LoggerFactory.getLogger(getClass());
-
-    public UserInfoDTO getUser(String userName){
-        return uploadFileRepository.getUser(userName);
-    }
-
-    public void setUser(UploadUserDTO userDTO){
-        uploadFileRepository.setUser(userDTO);
-    }
 
     public void fileSave(MultipartFile multipartFile,String userName,int includeDir){
         String uploadFilePath = uploadFileRepository.getUser(userName).getFolderPath() +"/"+ uploadFileRepository.get(userName,includeDir).getFileName();
@@ -72,16 +68,16 @@ public class UploadFileService {
     }
 
     public void folderSave(String userName,String folderName,int includeDir){
-        String uploadFilePath = uploadFileRepository.getUser(userName).getFolderPath();
+        MetaDataDTO upper = uploadFileRepository.get(userName,includeDir);
+        String uploadFilePath = uploadFileRepository.getUser(userName).getFolderPath() + "/" + upper.getFileName();
         logger.debug("userName: {}",userName);
         logger.debug("folderName: {}",folderName);
         logger.debug("filePath: {}",uploadFilePath);
         try{
             UploadFileDTO parameter = new UploadFileDTO(userName,true,0,folderName,uploadFilePath
                     ,false,includeDir);
-            save(parameter);
 
-            File folder = new File(uploadFilePath+"/" + folderName);
+            File folder = new File(uploadFilePath+ "/" + folderName);
             if(folder.exists()){
                 return;
             }
@@ -90,6 +86,7 @@ public class UploadFileService {
                 return;
             }
 
+            save(parameter);
         }catch (IllegalStateException e){
             logger.error("e",e);
         }
@@ -158,7 +155,7 @@ public class UploadFileService {
         logger.debug("userName: {}",userName);
         logger.debug("fileSeq: {}",fileSeq);
         MetaDataDTO fileInfo = get(userName,fileSeq);
-        String filePath = fileInfo.getFilePath() + fileInfo.getFileName();
+        String filePath = fileInfo.getFilePath() + "/" + fileInfo.getFileName();
         Path path = Paths.get(filePath);
 
         byte[] fileData = Files.readAllBytes(path);
@@ -202,5 +199,39 @@ public class UploadFileService {
         return result;
     }
     
+    public String encoding(String url){
+        String encodedString;
+        try {
+            encodedString = URLEncoder.encode(url, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Error encoding userName", e);
+        }
 
+        return encodedString;
+    }
+
+    public List<MetaDataDTO> getFolderStruct(String userName, int includeDir){
+        List<MetaDataDTO> list = getList(userName,-1);
+
+        List<MetaDataDTO> sideList = new ArrayList<>();
+        List<Integer> check = new ArrayList<>();
+
+        for(MetaDataDTO meta : list){
+            logger.debug("msg: {}",meta.getFileSeq());
+            if(check.contains(meta.getFileSeq())) continue;
+
+            if(meta.getIncludeDir() != 0) {
+                for (MetaDataDTO folder : sideList) {
+                    if (folder.getFileSeq() == meta.getIncludeDir()) {
+                        folder.getSubFiles().add(meta);
+                        break;
+                    }
+                }
+            }else{
+                sideList.add(meta);
+            }
+        }
+
+        return sideList;
+    }
 }
