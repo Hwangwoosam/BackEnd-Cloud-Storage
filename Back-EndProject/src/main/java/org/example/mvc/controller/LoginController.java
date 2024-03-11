@@ -38,20 +38,11 @@ public class LoginController {
             throw new BaseException(BaseResponseCode.DATA_IS_NULL, new String[]{"사용자 이름"});
         }
 
-        UserInfoDTO userInfoDTO = userService.getUser(userName);
-        if(userInfoDTO == null){
-            String uploadPath = globalConfig.getUploadFilePath();
-            String folderPath = UUID.randomUUID().toString();
-            File folder = new File(uploadPath + folderPath);
-            if(!folder.mkdir()){
-                throw new BaseException(BaseResponseCode.ERROR);
-            }
-            userService.setUser(new UploadUserDTO(userName,uploadPath + folderPath));
-            userInfoDTO = userService.getUser(userName);
-        }
+        userService.login(userName);
+
         String encodedName;
         try {
-            encodedName = URLEncoder.encode(userInfoDTO.getUserName(),"UTF-8");
+            encodedName = URLEncoder.encode(userName,"UTF-8");
         }catch (UnsupportedEncodingException e){
             throw new RuntimeException("Error encoding userName", e);
         }
