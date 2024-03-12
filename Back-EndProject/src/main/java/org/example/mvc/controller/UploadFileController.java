@@ -26,6 +26,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 
+import static org.example.utils.StringUtils.encodingUrl;
+
 @Controller
 @RequestMapping("/file")
 public class UploadFileController {
@@ -55,7 +57,7 @@ public class UploadFileController {
 
         uploadFileService.fileSave(multipartFile,userName,includeDir);
 
-        String encodedUserName = uploadFileService.encoding(userName);
+        String encodedUserName = encodingUrl(userName);
         return "redirect:/file/getList?userName=" + encodedUserName + "&includeDir=" + includeDir;
     }
 
@@ -105,12 +107,7 @@ public class UploadFileController {
         }
 
         uploadFileService.delete(userName,fileSeq);
-        String encodedUserName;
-        try {
-            encodedUserName = URLEncoder.encode(userName, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Error encoding userName", e);
-        }
+        String encodedUserName = encodingUrl(userName);
 
         model.addAttribute("userName",userName);
         model.addAttribute("includeDir",includeDir);
