@@ -1,5 +1,6 @@
 package org.example.mvc.service;
 
+import org.apache.catalina.User;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.ibatis.annotations.Param;
@@ -11,6 +12,8 @@ import org.example.mvc.domain.dto.UploadFileDTO;
 import org.example.mvc.domain.dto.UploadUserDTO;
 import org.example.mvc.domain.dto.UserInfoDTO;
 import org.example.mvc.repository.UploadFileRepository;
+import org.example.mvc.repository.UserRepository;
+import org.example.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -31,6 +35,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.ZipOutputStream;
 
 //@Slf4j
 @Service
@@ -40,23 +45,24 @@ public class UploadFileService {
     private GlobalConfig globalConfig;
     @Autowired
     private UploadFileRepository uploadFileRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
     public void fileSave(MultipartFile multipartFile,String userName,int includeDir){
-        String uploadFilePath = uploadFileRepository.getUser(userName).getFolderPath() +"/"+ uploadFileRepository.get(userName,includeDir).getFileName();
-        int idxOfDot = multipartFile.getOriginalFilename().lastIndexOf(".");
-        String prefix = multipartFile.getOriginalFilename().substring(idxOfDot + 1, multipartFile.getOriginalFilename().length());
+        String uploadFilePath = userRepository.getUser(userName).getFolderPath();
 
-        boolean thumbnailCheck = isImageFile(prefix);
+        if(includeDir != 0){
+            uploadFilePath = uploadFilePath + "/" + uploadFileRepository.get(userName,includeDir).getFileName();
+        }
 
-        String filename = multipartFile.getOriginalFilename();
-        filename = checkDuplicateFileName(filename,prefix,includeDir);
-        String pathname = uploadFilePath + "/" +filename;
+        String filename = Utils.checkDuplicateFileName(multipartFile.getOriginalFilename(),includeDir);
+        String pathname = uploadFilePath + "/" + filename;
 
         try {
             UploadFileDTO parameter = new UploadFileDTO(userName,false,(int)multipartFile.getSize(),filename,
-                    uploadFilePath,thumbnailCheck,includeDir);
+                    uploadFilePath,false,includeDir);
             save(parameter);
 
             File dest = new File(pathname);
@@ -68,11 +74,12 @@ public class UploadFileService {
     }
 
     public void folderSave(String userName,String folderName,int includeDir){
-        MetaDataDTO upper = uploadFileRepository.get(userName,includeDir);
-        String uploadFilePath = uploadFileRepository.getUser(userName).getFolderPath() + "/" + upper.getFileName();
-        logger.debug("userName: {}",userName);
-        logger.debug("folderName: {}",folderName);
-        logger.debug("filePath: {}",uploadFilePath);
+        String uploadFilePath = userRepository.getUser(userName).getFolderPath();
+
+        if(includeDir != 0){
+            uploadFilePath = uploadFilePath + "/" + userRepository.getUser(userName).getFolderPath();
+        }
+
         try{
             UploadFileDTO parameter = new UploadFileDTO(userName,true,0,folderName,uploadFilePath
                     ,false,includeDir);
@@ -85,7 +92,6 @@ public class UploadFileService {
             if(!folder.mkdir()){
                 return;
             }
-
             save(parameter);
         }catch (IllegalStateException e){
             logger.error("e",e);
@@ -97,8 +103,8 @@ public class UploadFileService {
         uploadFileRepository.save(metadataInsertDTO);
     }
 
-    public void modifyFolderName(MetaDataDTO metadataUpdateDTO){
-        uploadFileRepository.modifyFolderName(metadataUpdateDTO);
+    public void modifyName(MetaDataDTO metadataUpdateDTO){
+        uploadFileRepository.modifyName(metadataUpdateDTO);
     }
 
     public List<MetaDataDTO> getList(String userName,int includeDir){
@@ -147,67 +153,29 @@ public class UploadFileService {
         uploadFileRepository.delete(fileSeqs);
     }
 
-    private boolean isImageFile(String extension) {
-        return Arrays.asList("jpg", "png", "jpeg", "gif").contains(extension.toLowerCase());
-    }
-
     public ResponseEntity<byte[]> downloadFile(String userName,int fileSeq) throws IOException {
-        logger.debug("userName: {}",userName);
-        logger.debug("fileSeq: {}",fileSeq);
         MetaDataDTO fileInfo = get(userName,fileSeq);
-        String filePath = fileInfo.getFilePath() + "/" + fileInfo.getFileName();
-        Path path = Paths.get(filePath);
+        String encodedFileName = new String(fileInfo.getFileName().getBytes("UTF-8"), "ISO-8859-1") + ".zip";
 
-        byte[] fileData = Files.readAllBytes(path);
+        String filePath = fileInfo.getFilePath();
+        Path path = Paths.get(filePath,fileInfo.getFileName());
+        logger.debug("download Path: {}",path);
 
-        String encodedFileName = new String(fileInfo.getFileName().getBytes("UTF-8"), "ISO-8859-1");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDispositionFormData("attachment", encodedFileName);
 
-        return new ResponseEntity<>(fileData, headers, HttpStatus.OK);
-    }
+        if(fileInfo.getFileType() == 1){
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ZipOutputStream zipOut = new ZipOutputStream(baos);
+            Utils.compressDirectory(path,fileInfo.getFileName(),zipOut);
+            zipOut.close();
 
-    public String checkDuplicateFileName(String fileName,String prefix,int includeDir) {
-        logger.debug("checkDup: {}", fileName);
-        List<String> fileNames = uploadFileRepository.checkFileName(includeDir);
-
-        logger.debug("fileNames: {}", fileNames);
-
-
-        String result = fileName;
-
-        if (fileNames.contains(fileName)) {
-            Pattern p = Pattern.compile("(.*)\\s\\(([0-9]+)\\)[.].*");
-            Matcher m = p.matcher(fileName);
-
-            String originalFileName = fileName.substring(0, fileName.lastIndexOf("."));
-
-            if (m.find()) {
-                originalFileName = m.group(1);
-            }
-
-            String dest = "";
-            for (int i = 1; i < Integer.MAX_VALUE; i++) {
-                dest = String.format("%s (%d).%s", originalFileName, i, prefix);
-                logger.debug("dest: {}", dest);
-                if (!fileNames.contains(dest)) break;
-            }
-            result = dest;
+            return new ResponseEntity<>(baos.toByteArray(),headers,HttpStatus.OK);
+        }else {
+            byte[] fileData = Files.readAllBytes(path);
+            return new ResponseEntity<>(fileData,headers,HttpStatus.OK);
         }
-
-        return result;
-    }
-    
-    public String encoding(String url){
-        String encodedString;
-        try {
-            encodedString = URLEncoder.encode(url, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Error encoding userName", e);
-        }
-
-        return encodedString;
     }
 
     public List<MetaDataDTO> getFolderStruct(String userName, int includeDir){
