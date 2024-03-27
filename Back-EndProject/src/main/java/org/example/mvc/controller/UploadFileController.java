@@ -2,13 +2,10 @@ package org.example.mvc.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameters;
-import org.apache.commons.collections4.Predicate;
 import org.example.configuration.GlobalConfig;
 import org.example.configuration.exception.BaseException;
 import org.example.configuration.http.BaseResponseCode;
 import org.example.mvc.domain.dto.MetaDataDTO;
-import org.example.mvc.domain.dto.UploadUserDTO;
-import org.example.mvc.domain.dto.UserInfoDTO;
 import org.example.mvc.service.UploadFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,15 +15,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.apache.commons.collections4.CollectionUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 
-import static org.example.utils.StringUtils.encodingUrl;
+import static org.example.utils.Utils.encodingUrl;
 
 @Controller
 @RequestMapping("/file")
@@ -117,7 +112,6 @@ public class UploadFileController {
 
     @GetMapping("/download")
     public ResponseEntity<byte[]> downloadFile(@RequestParam("fileSeq") int fileSeq,@RequestParam("userName") String userName) throws IOException {
-
         logger.debug("download: {}",fileSeq + " " + userName);
         if(fileSeq < 0){
             throw new BaseException(BaseResponseCode.VALIDATE_REQUIRED,new String[]{"파일 번호"});
@@ -125,5 +119,6 @@ public class UploadFileController {
 
         return uploadFileService.downloadFile(userName,fileSeq);
     }
+
 
 }
