@@ -59,7 +59,7 @@
         )
     </insert>
 
-    <update id="modifyFolderName" parameterType="org.example.mvc.domain.dto.MetaDataDTO">
+    <update id="modifyName" parameterType="org.example.mvc.domain.dto.MetaDataDTO">
         UPDATE metadata SET fileName = #{fileName}
         WHERE userName = #{userName} and fileSeq = #{fileSeq}
     </update>
