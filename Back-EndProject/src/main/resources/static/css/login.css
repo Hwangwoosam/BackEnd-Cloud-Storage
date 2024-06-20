@@ -10,11 +10,11 @@
     font-weight: bold;
 }
 
-.loginSection {
+.loginSection{
   position: absolute;
-  top: 50%;
+  top: 30%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -30%);
   max-width: 400px;
   padding: 20px;
   background-color: #f5f5f5;
@@ -46,6 +46,16 @@ h2 {
   height: 30px;
   text-indent: 7px;
   margin-bottom: 8px;
+}
+
+.options{
+    padding: 10px;
+}
+
+.options > a{
+    color: black;
+    text-decoration-line: none;
+    margin-left: 10px;
 }
 
 /* Styling the submit button  input[type="submit"]*/
