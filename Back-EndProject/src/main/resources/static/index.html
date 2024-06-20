@@ -1,16 +1,38 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" href="/css/login.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/login.css" />
+    <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+    />
+    <title>로그인</title>
 </head>
-<body>
-<form id="loginForm" action="/file/getList" method="get" >
-    <label for="userName">사용자 이름:</label>
-    <input type="text" id="userName" name="userName" required>
-    <button type="submit">로그인</button>
-</form>
 
+<body>
+<header class="header"><i>Cloud Storage Web Service</i></header>
+<div class="loginSection">
+    <h2>Login</h2>
+    <form method="post" action="/login" id="login-form">
+        <div class="login_input">
+            <input type="text" name="id" placeholder="ID" />
+            <input type="password" name="passwd" placeholder="PASSWORD" />
+        </div>
+        <label for="remember-check">
+            <input type="checkbox" id="remember-check"> 아이디 저장하기
+        </label>
+        <div class="submit_button">
+            <input type="submit" value="로그인" />
+        </div>
+        <div class="submit_button">
+            <button class="button" onclick="location.href=''">아이디/비밀번호 찾기</button>
+        </div>
+        <div class="submit_button">
+            <button class="button" onclick="location.href=''">회원가입</button>
+        </div>
+    </form>
+</div>
 </body>
 </html>
