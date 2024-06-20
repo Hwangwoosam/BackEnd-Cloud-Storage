@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/register.css">
+</head>
+<body>
+<header class="header"><i>Cloud Storage Web Service</i></header>
+<section>
+    <div class="registerSection">
+        <h2 class="logo">회원가입</h2>
+        <form id="registerForm" action="/register" method="post">
+            <div class="register_input">
+                <div class="id_input">
+                    <input type="text" id="ID" placeholder="ID" required>
+                    <button class="button" type="button" id="checkDuplicate">중복체크</button>
+                </div>
+                <input type="password" id="password" placeholder="Password" required>
+                <input type="text" id="userName" placeholder="userName" required>
+                <input type="text" id="phoneNumber" placeholder="phoneNumber" required>
+                <input type="text" id="email" placeholder="email" required>
+            </div>
+            <button class="button" type="submit" id="register">회원가입</button>
+        </form>
+    </div>
+</section>
+<footer></footer>
+</body>
+</html>
