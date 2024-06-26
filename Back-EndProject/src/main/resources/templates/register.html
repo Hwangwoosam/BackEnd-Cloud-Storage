@@ -3,28 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
-    <link rel="stylesheet" href="/css/register.css">
+    <link rel="stylesheet" href="/css/login.css">
+    <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+    />
 </head>
 <body>
-<section>
-    <div class="registerSection">
+    <div class="container">
         <div class="header"><i>Cloud Storage Web Service</i></div>
         <h2 class="logo">회원가입</h2>
-        <form id="registerForm" action="/register" method="post">
-            <div class="register_input">
+        <form id="inputForm" action="/register" method="post">
+            <div class="typeInput">
                 <div class="id_input">
                     <input type="text" id="ID" placeholder="ID" required>
-                    <button class="button" type="button" id="checkDuplicate">중복체크</button>
+                    <div class="submit_button">
+                        <input type="button" id="checkDuplicate" value="중복체크" />
+                    </div>
                 </div>
                 <input type="password" id="password" placeholder="Password" required>
                 <input type="text" id="userName" placeholder="userName" required>
                 <input type="text" id="phoneNumber" placeholder="phoneNumber" required>
                 <input type="text" id="email" placeholder="email" required>
             </div>
-            <button class="button" type="submit" id="register">회원가입</button>
+            <div class="submit_button">
+                <input type="submit" value="회원 가입" />
+            </div>
         </form>
     </div>
-</section>
 <footer></footer>
 </body>
 </html>

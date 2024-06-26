@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="css/findId.css" />
+    <link rel="stylesheet" href="css/login.css" />
     <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
@@ -12,16 +12,18 @@
 
 <body>
 
-<div class="findSection">
+<div class="container">
     <div class="header"><i>Cloud Storage Web Service</i></div>
     <h2>아이디 찾기</h2>
-    <form id="find-id-Form" action="" method="post">
-        <div class="find_input">
+    <form class="inputForm" action="" method="post">
+        <div class="typeInput">
             <input type="text" id="userName" placeholder="userName" required>
             <input type="text" id="id-phoneNumber" placeholder="phoneNumber" required>
             <input type="text" id="id-email" placeholder="email" required>
         </div>
-        <button class="button" type="submit" id="find-id">아이디 찾기</button>
+        <div class="submit_button">
+            <input type="submit" value="아이디 찾기" />
+        </div>
     </form>
 </div>
 </body>
