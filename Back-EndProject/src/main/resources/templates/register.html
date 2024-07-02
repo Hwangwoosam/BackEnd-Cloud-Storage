@@ -8,6 +8,14 @@
             rel="stylesheet"
             href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
     />
+    <script src="js/register.js"></script>
+    <style>
+        #idCheckResult{
+            margin-top: 5px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -16,15 +24,16 @@
         <form id="inputForm" action="/register" method="post">
             <div class="typeInput">
                 <div class="id_input">
-                    <input type="text" id="ID" placeholder="ID" required>
+                    <input type="text" id="userId" name="userId" placeholder="ID" required>
                     <div class="submit_button">
                         <input type="button" id="checkDuplicate" value="중복체크" />
                     </div>
                 </div>
-                <input type="password" id="password" placeholder="Password" required>
-                <input type="text" id="userName" placeholder="userName" required>
-                <input type="text" id="phoneNumber" placeholder="phoneNumber" required>
-                <input type="text" id="email" placeholder="email" required>
+                <div id="idCheckResult"></div>
+                <input type="password" id="password" name="password" placeholder="Password" required>
+                <input type="text" id="userName" name="userName" placeholder="userName" required>
+                <input type="text" id="phoneNumber" name="phoneNumber" placeholder="phoneNumber" required>
+                <input type="text" id="email" name="email" placeholder="email" required>
             </div>
             <div class="submit_button">
                 <input type="submit" value="회원 가입" />
