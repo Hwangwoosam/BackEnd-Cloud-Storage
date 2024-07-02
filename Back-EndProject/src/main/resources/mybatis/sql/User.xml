@@ -1,25 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.example.mvc.repository.UserRepository">
-    <select id="getUser" resultType="org.example.mvc.domain.dto.UserInfoDTO">
-        SELECT
-        userId,
-        userName,
-        folderPath
-        FROM userinfo
-        WHERE userName = #{userName}
+    <select id="checkDuplicateId" resultType="int">
+        SELECT count(*)
+        FROM user
+        WHERE userId = #{userId}
     </select>
 
-    <insert id="setUser" parameterType="org.example.mvc.domain.dto.UploadUserDTO">
-        INSERT INTO userinfo
-        (
-        userName,
-        folderPath
-        )
-        VALUES
-        (
-        #{userName},
-        #{folderPath}
+    <insert id="register" parameterType="org.example.mvc.domain.entity.User" useGeneratedKeys="true" keyProperty="id">
+        Insert Into user(userId,password,name,phoneNumber,email,totalSize)
+        Value(
+            #{user.userId},
+            #{user.password},
+            #{user.userName},
+            #{user.phoneNumber},
+            #{user.email},
+            #{user.totalSize}
         )
     </insert>
 </mapper>
