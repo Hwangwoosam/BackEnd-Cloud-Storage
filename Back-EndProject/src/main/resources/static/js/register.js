@@ -1,17 +1,79 @@
+let elInputUserId = document.getElementById("userId");
+let elFailureMessage = document.querySelector('.failure-message');
+let elFailureMessageTwo = document.querySelector('.failure-message2');
+
+let elInputPassword = document.getElementById("password");
+let elInputPasswordRetype = document.querySelector('#password-retype');
+let elMismatchMessage = document.querySelector('.mismatch-message');
+let elStrongPasswordMessage = document.querySelector('.strongPassword-message');
+
 document.addEventListener('DOMContentLoaded',function(){
     const checkDuplicateButton = document.getElementById('checkDuplicate');
     checkDuplicateButton.addEventListener('click',checkDuplicateId);
 
-    const registerForm = document.getElementById('inputForm');
-    registerForm.addEventListener('submit', function(event) {
+    const inputForm = document.getElementById('inputForm');
+    inputForm.addEventListener('submit', function(event) {
         event.preventDefault();
         submitForm();
     });
 });
 
-function clearResult() {
-    const resultDiv = document.getElementById('idCheckResult');
-    resultDiv.textContent = '';
+function idLength(value){
+    return value.length >= 4 && value.length <= 12
+}
+
+function onlyNumberAndEnglish(str){
+    return /^[A-Za-z0-9]+$/.test(str);
+}
+
+function strongPassword(str){
+    return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(str);
+}
+
+function isMatch (password1, password2) {
+  return password1 === password2;
+}
+
+elInputUserId.onkeyup = function(){
+    if (elInputUserId.value.length !== 0) {
+        if(onlyNumberAndEnglish(elInputUserId.value) === false){
+            elFailureMessage.classList.add('hide');
+            elFailureMessageTwo.classList.remove('hide');
+        }else if(idLength(elInputUserId.value) === false){
+            elFailureMessage.classList.remove('hide');
+            elFailureMessageTwo.classList.add('hide');
+        }else if(idLength(elInputUserId.value) || onlyNumberAndEnglish(elInputUserId.value)){
+            elFailureMessage.classList.add('hide');
+            elFailureMessageTwo.classList.add('hide');
+        }
+    }else {
+         elFailureMessage.classList.add('hide');
+         elFailureMessageTwo.classList.add('hide');
+    }
+}
+
+elInputPassword.onkeyup = function(){
+    if(elInputPassword.value.length !== 0){
+        if(strongPassword(elInputPassword.value)){
+            elStrongPasswordMessage.classList.add('hide');
+        }else{
+            elStrongPasswordMessage.classList.remove('hide');
+        }
+    }else{
+        elStrongPasswordMessage.classList.add('hide');
+    }
+}
+
+elInputPasswordRetype.onkeyup = function(){
+    if(elInputPasswordRetype.value.length !== 0){
+        if(isMatch(elInputPassword.value, elInputPasswordRetype.value)){
+            elMismatchMessage.classList.add('hide');
+        }else{
+            elMismatchMessage.classList.remove('hide');
+        }
+    }else{
+        elMismatchMessage.classList.add('hide');
+    }
 }
 
 function checkDuplicateId(){
@@ -47,14 +109,15 @@ function checkDuplicateId(){
 function submitForm() {
     const form = document.getElementById('inputForm');
     const formData = new FormData(form);
-    const user = Object.fromEntries(formData);
+    const userData = {};
+    formData.forEach((value, key) => { userData[key] = value });;
 
     fetch('/register', {
         method: 'POST',
         headers: {
-              'Content-Type': 'application/json',
+               "Content-Type":"application/json; charset=utf-8"
         },
-        body: JSON.stringify(user)
+        body: JSON.stringify(userData)
     })
     .then(response => response.json())
     .then(data => {
