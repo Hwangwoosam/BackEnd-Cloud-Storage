@@ -7,6 +7,7 @@ import org.example.mvc.domain.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.example.mvc.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -23,6 +24,7 @@ public class UserService {
         return false;
     }
 
+    @Transactional
     public boolean registerUser(UserRegisterDTO userDto){
         User user = new User(userDto);
         if(userRepository.register(user) == 0) return false;
