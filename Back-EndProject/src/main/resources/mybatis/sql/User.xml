@@ -7,15 +7,14 @@
         WHERE userId = #{userId}
     </select>
 
-    <insert id="register" parameterType="org.example.mvc.domain.entity.User" useGeneratedKeys="true" keyProperty="id">
-        Insert Into user(userId,password,name,phoneNumber,email,totalSize)
-        Value(
-            #{user.userId},
-            #{user.password},
-            #{user.userName},
-            #{user.phoneNumber},
-            #{user.email},
-            #{user.totalSize}
-        )
+    <insert id="register" parameterType="org.example.mvc.domain.entity.User" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO user(userId,password,name,phoneNumber,email,totalSize)
+        Values(
+        #{userId},
+        #{password},
+        #{userName},
+        #{phoneNumber},
+        #{email},
+        #{totalSize})
     </insert>
 </mapper>
