@@ -29,21 +29,19 @@ public class loginController {
     }
     @PostMapping("checkDuplicateId")
     @ResponseBody
-    public boolean checkDuplicatedId(Map<String, String> payload){
-        String userId = payload.get("userId");
-        System.out.println(userId);
-        boolean isDuplicate = userService.checkDuplicateId(userId);
+    public boolean checkDuplicatedId(@RequestBody Map<String, String> userId){
+        String user = userId.get("userId");
+        System.out.println("checkId: " + user);
+        boolean isDuplicate = userService.checkDuplicateId(user);
+
         return  isDuplicate;
     }
 
     @PostMapping("register")
     @ResponseBody
-    public Map<String,Object> register(UserRegisterDTO user){
+    public Map<String,Object> register(@RequestBody UserRegisterDTO user){
         Map<String,Object> response = new HashMap<>();
-        System.out.println(user.getUserId());
-        System.out.println(user.getUserName());
-        System.out.println(user.getPassword());
-        System.out.println(user.getEmail());
+
         try {
             userService.registerUser(user);
             response.put("success",true);
