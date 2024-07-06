@@ -25,7 +25,7 @@
         <form id="inputForm">
             <div class="typeInput">
                 <div class="id_input">
-                    <input type="text" id="userId" placeholder="ID" minlength="4" maxlength="12" required >
+                    <input type="text" id="userId" name="userId" placeholder="ID" minlength="4" maxlength="12" required >
                     <div class="submit_button">
                         <input type="button" id="checkDuplicate" value="중복체크" />
                     </div>
@@ -34,16 +34,19 @@
                 <div class="failure-message message hide">아이디는 4~12글자이어야 합니다</div>
                 <div class="failure-message2 message hide">영어 또는 숫자만 가능합니다</div>
 
-                <input type="password" id="password" maxlength="20" placeholder="Password" required>
+                <input type="password" id="password" name="password" autocomplete="off" maxlength="20" placeholder="Password" required>
                 <div class="strongPassword-message message hide">8글자 이상, 영문, 숫자, 특수문자(@$!%*#?&)를 사용하세요</div>
-                <input type="password" id="password-retype" maxlength="20" placeholder="비밀번호 확인">
+                <input type="password" id="password-retype" autocomplete="off" maxlength="20" placeholder="비밀번호 확인">
                 <div class="mismatch-message message hide">비밀번호가 일치하지 않습니다</div>
 
-                <input type="text" id="userName" placeholder="userName" required>
+                <input type="text" id="userName" name="userName" placeholder="userName" required>
                 <div class="name-failure-message message hide">영어 또는 한글만 가능합니다</div>
-                <input type="text" id="phoneNumber" placeholder="phoneNumber" required>
+                <div class="name-failure-message2 message hide">이름은 2~12글자이어야 합니다</div>
+
+                <input type="text" id="phoneNumber" name="phoneNumber" placeholder="phoneNumber" required>
                 <div class="phoneNumber-failure-message message hide">올바른 전화번호가 아닙니다.</div>
-                <input type="text" id="email" placeholder="email" required>
+
+                <input type="text" id="email" name="email" placeholder="email" required>
                 <div class="email-failure-message message hide">올바른 이메일이 아닙니다.</div>
             </div>
             <div class="submit_button">
