@@ -1,4 +1,4 @@
-package org.example.mvc.controller;
+package org.example.mvc.controller.api;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.example.mvc.domain.dto.UserLoginDTO;
