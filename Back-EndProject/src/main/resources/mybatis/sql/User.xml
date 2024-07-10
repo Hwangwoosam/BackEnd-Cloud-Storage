@@ -7,6 +7,12 @@
         WHERE userId = #{userId}
     </select>
 
+    <select id="isRegister" resultType="int">
+        SELECT count(*)
+        FROM user
+        WHERE userId = #{userId} and password = #{password}
+    </select>
+
     <insert id="register" parameterType="org.example.mvc.domain.entity.User" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO user(userId,password,name,phoneNumber,email,totalSize)
         Values(
