@@ -1,5 +1,6 @@
 package org.example.mvc.repository;
 
+import org.example.mvc.domain.dto.UserLoginDTO;
 import org.example.mvc.domain.entity.User;
 import org.springframework.stereotype.Repository;
 
@@ -9,6 +10,6 @@ public interface UserRepository {
     int checkDuplicateId(String userId);
     int register(User user);
 
-    User login(String id, String password);
+    int isRegister(UserLoginDTO userLoginDTO);
 
 }

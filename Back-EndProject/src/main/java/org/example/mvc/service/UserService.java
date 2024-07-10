@@ -2,6 +2,7 @@ package org.example.mvc.service;
 
 //import org.example.configuration.GlobalConfig;
 //import org.example.mvc.domain.dto.UserInfoDTO;
+import org.example.mvc.domain.dto.UserLoginDTO;
 import org.example.mvc.domain.dto.UserRegisterDTO;
 import org.example.mvc.domain.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
-//    @Autowired
-//    private GlobalConfig globalConfig;
-//
+
     @Autowired
     private UserRepository userRepository;
 
@@ -26,25 +25,16 @@ public class UserService {
 
     @Transactional
     public boolean registerUser(UserRegisterDTO userDto){
+        //id, password 유효성 검사
         User user = new User(userDto);
         if(userRepository.register(user) == 0) return false;
-
         return true;
     }
 
 
-    //    public void login(String userName){
-//        if(!IsRegisterUser(userName)){
-//            String uploadPath = globalConfig.getUploadFilePath();
-//            String folderPath = UUID.randomUUID().toString();
-//            File folder = new File(uploadPath + folderPath);
-//
-//            if(!folder.mkdir()){
-//                throw new BaseException(BaseResponseCode.ERROR);
-//            }
-//            setUser(new UploadUserDTO(userName,uploadPath + folderPath));
-//        }
-//    }
+    public boolean login(UserLoginDTO userLoginDTO){
+        return userRepository.isRegister(userLoginDTO) == 1;
+    }
 //
 //    public boolean IsRegisterUser(String userName){
 //        UserInfoDTO userInfoDTO = getUser(userName);
