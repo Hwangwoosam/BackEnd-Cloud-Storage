@@ -8,19 +8,20 @@
     </select>
 
     <select id="isRegister" resultType="int">
-        SELECT count(*)
+        SELECT id
         FROM user
         WHERE userId = #{userId} and password = #{password}
     </select>
 
     <insert id="register" parameterType="org.example.mvc.domain.entity.User" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO user(userId,password,name,phoneNumber,email,totalSize)
+        INSERT INTO user(userId,password,name,phoneNumber,email,totalSize,rootPath)
         Values(
         #{userId},
         #{password},
         #{userName},
         #{phoneNumber},
         #{email},
-        #{totalSize})
+        #{totalSize},
+        #{rootPath})
     </insert>
 </mapper>
