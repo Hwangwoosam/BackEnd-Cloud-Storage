@@ -13,7 +13,7 @@ var passwordElement = {
 };
 
 var passwordRetypeElement = {
-    passwordRetype: document.querySelector('#password-retype'),
+    passwordRetype: document.getElementById('passwordRetype'),
     mismatch: document.querySelector('.mismatch-message')
 };
 
@@ -28,6 +28,9 @@ var phoneNumberElement = {
     formatValid: document.querySelector('.phoneNumber-failure-message')
 };
 
+var isIdChecked = false;
+var isFormValid = false;
+
 document.addEventListener('DOMContentLoaded',function(){
     const checkDuplicateButton = document.getElementById('checkDuplicate');
     checkDuplicateButton.addEventListener('click',checkDuplicateId);
@@ -35,8 +38,22 @@ document.addEventListener('DOMContentLoaded',function(){
     const inputForm = document.getElementById('inputForm');
     inputForm.addEventListener('submit', function(event) {
         event.preventDefault();
-        registerSubmit();
+        if(isIdChecked && isFormValid){
+            registerSubmit();
+        }else if(!isIdChecked){
+            alert('아이디 중복 검사를 먼저 진행해주세요.');
+        }else{
+            alert('모든 입력 항목을 올바르게 작성해주세요.');
+        }
     });
+
+    userIdElement.userId.addEventListener('input',validateForm);
+    passwordElement.password.addEventListener('input',validateForm);
+    passwordRetypeElement.passwordRetype.addEventListener('input', validateForm);
+    userNameElement.userName.addEventListener('input',validateForm);
+    phoneNumberElement.phoneNumber.addEventListener('input',validateForm);
+
+    validateForm();
 });
 
 userIdElement.userId.onkeyup = function(){
@@ -143,6 +160,30 @@ phoneNumberElement.phoneNumber.onkeyup = function(){
     }
 }
 
+function validateForm() {
+    const userId = userIdElement.userId.value;
+    const password = passwordElement.password.value;
+    const passwordRetype = passwordRetypeElement.passwordRetype.value;
+    const userName = userNameElement.userName.value;
+    const phoneNumber = phoneNumberElement.phoneNumber.value;
+
+    isFormValid =
+        idLength(userId) &&
+        onlyNumberAndEnglish(userId) &&
+        strongPassword(password) &&
+        isMatch(password, passwordRetype) &&
+        nameLength(userName) &&
+        onlyKoreanAndEnglish(userName) &&
+        checkPhoneNumber(phoneNumber);
+
+    updateRegisterButton();
+}
+
+function updateRegisterButton() {
+    const registerButton = document.getElementById('registerButton');
+    registerButton.disabled = !(isIdChecked && isFormValid);
+}
+
 function checkDuplicateId(){
     const id = document.getElementById('userId').value;
     const resultDiv = document.getElementById('idCheckResult');
@@ -160,9 +201,11 @@ function checkDuplicateId(){
             if(isDuplicate){
                 resultDiv.style.color = 'red';
                 resultDiv.textContent = '이미 존재하는 아이디입니다.';
+                isIdChecked = false;
             }else{
                 resultDiv.style.color = 'blue';
                 resultDiv.textContent = '생성 가능한 아이디입니다.';
+                isIdChecked = true;
             }
         })
         .catch(error => {

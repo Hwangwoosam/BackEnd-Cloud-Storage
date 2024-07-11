@@ -3,7 +3,7 @@ export function submitForm(apiEndpoint, funcMsg, redirect) {
     const formData = new FormData(form);
     const userData = {};
     formData.forEach((value, key) => { userData[key] = value });;
-
+    console.log(userData);
     fetch(apiEndpoint, {
         method: 'POST',
         headers: {
