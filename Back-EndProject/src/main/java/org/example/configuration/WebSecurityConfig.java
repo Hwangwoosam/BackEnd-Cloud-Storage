@@ -21,16 +21,19 @@ public class WebSecurityConfig {
         http
                 .csrf(csrf ->csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/api/**"))
+                        .ignoringRequestMatchers("/api/**","/login", "/register", "/findId", "/checkDuplicatedId","/findPassword","/changePassword"))
                 .authorizeRequests(authz -> authz
                         .requestMatchers(mvcMatcherBuilder.pattern("/")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/loginPage")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/registerPage")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/findIdPage")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/findPasswordPage")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/findPassword")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/changePassword")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/fileListPage")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/login")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/register")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/findId")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/checkDuplicatedId")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/indext.html")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/css/**")).permitAll()
