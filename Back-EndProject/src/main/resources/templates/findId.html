@@ -8,6 +8,16 @@
             rel="stylesheet"
             href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
     />
+    <style>
+        .message{
+            margin-top: 5px;
+            margin-bottom: 5px;
+            font-size: 15px;
+            color: #ff0000;
+            font-weight: bold;
+        }
+    </style>
+    <title>아이디 찾기</title>
 </head>
 
 <body>
@@ -15,16 +25,29 @@
 <div class="container">
     <div class="header"><i>Cloud Storage Web Service</i></div>
     <h2>아이디 찾기</h2>
-    <form class="inputForm" action="" method="post">
+    <form class="inputForm" id="findIdForm">
         <div class="typeInput">
-            <input type="text" id="userName" placeholder="userName" required>
-            <input type="text" id="id-phoneNumber" placeholder="phoneNumber" required>
-            <input type="text" id="id-email" placeholder="email" required>
+            <input type="text" id="userName" name="userName" placeholder="userName" required>
+            <div class="name-failure-message message hide">영어 또는 한글만 가능합니다</div>
+            <div class="name-failure-message2 message hide">이름은 2~12글자이어야 합니다</div>
+
+            <input type="text" id="phoneNumber" name="phoneNumber" placeholder="phoneNumber" required>
+            <div class="phoneNumber-failure-message message hide">올바른 전화번호가 아닙니다.</div>
+
+            <input type="text" id="email" name="email" placeholder="email" required>
+            <div class="email-failure-message message hide">올바른 이메일이 아닙니다.</div>
         </div>
         <div class="submit_button">
-            <input type="submit" value="아이디 찾기" />
+            <input type="submit" id="findIdButton" value="아이디 찾기" />
         </div>
     </form>
+    <div id="result" style="display: none;">
+        <p id="resultMessage"></p>
+        <div class="submit_button">
+            <input type="button" id="goToLogin" value="로그인 페이지로 이동" style="display: none;" />
+        </div>
+    </div>
 </div>
+<script type="module" src="js/findId.js"></script>
 </body>
 </html>
