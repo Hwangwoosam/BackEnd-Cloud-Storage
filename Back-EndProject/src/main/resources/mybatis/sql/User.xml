@@ -24,4 +24,22 @@
         #{totalSize},
         #{rootPath})
     </insert>
+
+    <select id="findUserId" resultType="String">
+        SELECT userId
+        FROM user
+        WHERE name = #{userName} and email = #{email}
+    </select>
+
+    <select id="findId" resultType="int">
+        SELECT id
+        FROM user
+        WHERE userId = #{userId} and email = #{email}
+    </select>
+
+    <update id="changePassword" parameterType="org.example.mvc.domain.dto.UserChangePassword">
+        UPDATE user
+            SET password = #{nextPassword}
+        WHERE id = #{id}
+    </update>
 </mapper>
