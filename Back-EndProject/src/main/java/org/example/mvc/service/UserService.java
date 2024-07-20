@@ -2,17 +2,22 @@ package org.example.mvc.service;
 
 //import org.example.configuration.GlobalConfig;
 //import org.example.mvc.domain.dto.UserInfoDTO;
-import org.example.mvc.domain.dto.UserLoginDTO;
-import org.example.mvc.domain.dto.UserRegisterDTO;
+import org.example.configuration.GlobalConfiguration;
+import org.example.mvc.domain.dto.*;
 import org.example.mvc.domain.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.example.mvc.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.util.UUID;
+
 @Service
 public class UserService {
 
+    @Autowired
+    private GlobalConfiguration globalConfiguration;
     @Autowired
     private UserRepository userRepository;
 
@@ -25,9 +30,18 @@ public class UserService {
 
     @Transactional
     public boolean registerUser(UserRegisterDTO userDto){
-        //id, password 유효성 검사
-        User user = new User(userDto);
+        String folderName = UUID.randomUUID().toString();
+
+        User user = new User(userDto,folderName);
         if(userRepository.register(user) == 0) return false;
+
+        File file = new File(globalConfiguration.getUploadPath() + folderName);
+        if(file.mkdir()){
+            System.out.println("User Directory Created Success");
+        }else{
+            System.out.println("User Directory Created failed");
+        }
+
         return true;
     }
 
@@ -35,21 +49,16 @@ public class UserService {
     public boolean login(UserLoginDTO userLoginDTO){
         return userRepository.isRegister(userLoginDTO) == 1;
     }
-//
-//    public boolean IsRegisterUser(String userName){
-//        UserInfoDTO userInfoDTO = getUser(userName);
-//
-//        if(userInfoDTO == null) return false;
-//
-//        return true;
-//    }
-//
-//    public UserInfoDTO getUser(String userName){
-//        return userRepository.getUser(userName);
-//    }
-//
-//    public void setUser(UploadUserDTO userDTO){
-//        userRepository.setUser(userDTO);
-//    }
-//
+
+    public String findUserIdByNameAndEmail(UserFindIdDTO userFindIdDTO){
+        return userRepository.findUserId(userFindIdDTO);
+    }
+
+    public Integer findIdByUserIdAndEmail(UserFindPasswordDTO userFindPasswordDTO){
+        return userRepository.findId(userFindPasswordDTO);
+    }
+
+    public boolean changePassword(UserChangePassword userChangePassword){
+        return userRepository.changePassword(userChangePassword) == 1;
+    }
 }
