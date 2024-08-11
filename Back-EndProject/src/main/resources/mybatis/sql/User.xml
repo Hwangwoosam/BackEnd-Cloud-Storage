@@ -1,45 +1,39 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.example.mvc.repository.UserRepository">
-    <select id="checkDuplicateId" resultType="int">
-        SELECT count(*)
+    <select id="findByUserId" resultType="org.example.mvc.domain.dto.User.UserInfoDTO">
+        SELECT id,userId,name,password,rootPath,totalSize
         FROM user
         WHERE userId = #{userId}
     </select>
 
-    <select id="isRegister" resultType="int">
-        SELECT id
+    <select id="findByUserName" resultType="org.example.mvc.domain.dto.User.UserInfoDTO">
+        SELECT id,userId,name,password,rootPath,totalSize
         FROM user
-        WHERE userId = #{userId} and password = #{password}
+        WHERE name = #{userName}
     </select>
+
+<!--    <select id="login" resultType="org.example.mvc.domain.dto.User.UserInfoDTO">-->
+<!--        SELECT id, name, rootPath,totalSize-->
+<!--        FROM user-->
+<!--        WHERE userId = #{userId} and password = #{password}-->
+<!--    </select>-->
 
     <insert id="register" parameterType="org.example.mvc.domain.entity.User" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO user(userId,password,name,phoneNumber,email,totalSize,rootPath)
         Values(
         #{userId},
         #{password},
-        #{userName},
+        #{name},
         #{phoneNumber},
         #{email},
         #{totalSize},
         #{rootPath})
     </insert>
 
-    <select id="findUserId" resultType="String">
-        SELECT userId
-        FROM user
-        WHERE name = #{userName} and email = #{email}
-    </select>
-
-    <select id="findId" resultType="int">
-        SELECT id
-        FROM user
-        WHERE userId = #{userId} and email = #{email}
-    </select>
-
-    <update id="changePassword" parameterType="org.example.mvc.domain.dto.UserChangePassword">
+    <update id="changePassword" parameterType="org.example.mvc.domain.dto.User.UserChangePassword">
         UPDATE user
             SET password = #{nextPassword}
-        WHERE id = #{id}
+        WHERE userId = #{userId}
     </update>
 </mapper>
