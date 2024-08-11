@@ -2,7 +2,7 @@ export function submitForm(apiEndpoint, funcMsg, redirect) {
     const form = document.getElementById('inputForm');
     const formData = new FormData(form);
     const userData = {};
-    formData.forEach((value, key) => { userData[key] = value });;
+    formData.forEach((value, key) => { userData[key] = value });
     console.log(userData);
     fetch(apiEndpoint, {
         method: 'POST',
@@ -11,7 +11,13 @@ export function submitForm(apiEndpoint, funcMsg, redirect) {
         },
         body: JSON.stringify(userData)
     })
-    .then(response => response.json())
+    .then(response => {
+            if(!response.ok){
+                throw new Error('Network response was not ok')
+            }
+
+            return response.json()  // 먼저 텍스트로 받아옵니다.
+    })
     .then(data => {
         if (data.success) {
             alert( funcMsg + '완료되었습니다.');

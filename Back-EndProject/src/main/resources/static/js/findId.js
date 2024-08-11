@@ -6,10 +6,6 @@ var userNameElement = {
     lengthValid: document.querySelector('.name-failure-message2')
 };
 
-var phoneNumberElement = {
-    phoneNumber: document.getElementById("phoneNumber"),
-    formatValid: document.querySelector('.phoneNumber-failure-message')
-};
 
 var isFormValid = false;
 
@@ -20,7 +16,6 @@ document.addEventListener('DOMContentLoaded',function(){
     const goToLoginButton = document.getElementById('goToLogin');
 
     userNameElement.userName.addEventListener('input',validateForm);
-    phoneNumberElement.phoneNumber.addEventListener('input',validateForm);
 
     validateForm();
 
@@ -61,7 +56,7 @@ async function findIdFormSubmit(form){
         formData.forEach((value, key) => { userData[key] = value });
 
          try {
-                const response = await fetch("/findId", {
+                const response = await fetch("/login/findId", {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json"
@@ -84,7 +79,7 @@ async function findIdFormSubmit(form){
                 const data = await response.json();
 
                 if (data.success) {
-                    return data.foundId;
+                    return data.userId;
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -117,32 +112,12 @@ userNameElement.userName.onkeyup = function(){
     }
 }
 
-phoneNumberElement.phoneNumber.onkeyup = function(){
-    if(phoneNumberElement.phoneNumber.value.length !== 0)
-    {
-        if(checkPhoneNumber(phoneNumberElement.phoneNumber.value) === false)
-        {
-            phoneNumberElement.formatValid.classList.remove('hide');
-        }
-        else
-        {
-            phoneNumberElement.formatValid.classList.add('hide');
-        }
-    }
-    else
-    {
-        phoneNumberElement.formatValid.classList.add('hide');
-    }
-}
-
 function validateForm() {
     const userName = userNameElement.userName.value;
-    const phoneNumber = phoneNumberElement.phoneNumber.value;
 
     isFormValid =
         nameLength(userName) &&
-        onlyKoreanAndEnglish(userName) &&
-        checkPhoneNumber(phoneNumber);
+        onlyKoreanAndEnglish(userName)
 
     updateFindIdButton();
 }

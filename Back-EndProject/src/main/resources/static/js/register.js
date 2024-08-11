@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded',function(){
     checkDuplicateButton.addEventListener('click',checkDuplicateId);
 
     const inputForm = document.getElementById('inputForm');
+
     inputForm.addEventListener('submit', function(event) {
         event.preventDefault();
         if(isIdChecked && isFormValid){
@@ -79,6 +80,8 @@ userIdElement.userId.onkeyup = function(){
          userIdElement.lengthValid.classList.add('hide');
          userIdElement.componentValid.classList.add('hide');
     }
+    updateDuplicateCheckButton();
+    resetDuplicateCheck();
 }
 
 passwordElement.password.onkeyup = function(){
@@ -184,6 +187,19 @@ function updateRegisterButton() {
     registerButton.disabled = !(isIdChecked && isFormValid);
 }
 
+function updateDuplicateCheckButton() {
+    const checkDuplicateButton = document.getElementById('checkDuplicate');
+    const userId = userIdElement.userId.value;
+    checkDuplicateButton.disabled = !(idLength(userId) && onlyNumberAndEnglish(userId));
+}
+
+function resetDuplicateCheck() {
+    isIdChecked = false;
+    const resultDiv = document.getElementById('idCheckResult');
+    resultDiv.textContent = '';
+    updateRegisterButton();
+}
+
 function checkDuplicateId(){
     const id = document.getElementById('userId').value;
     const resultDiv = document.getElementById('idCheckResult');
@@ -195,10 +211,17 @@ function checkDuplicateId(){
         body: JSON.stringify({ userId: id })
     };
 
-    fetch('/checkDuplicateId', requestOptions)
-        .then(response => response.json())
-        .then(isDuplicate => {
-            if(isDuplicate){
+    fetch('/login/checkDuplicateId', requestOptions)
+        .then(response => {
+            if(!response.ok){
+                throw new Error('Network response was not ok')
+            }
+
+            return response.json()
+         })
+        .then(data => {
+            console.log(data.isDuplicate);
+            if(!data.isDuplicate){
                 resultDiv.style.color = 'red';
                 resultDiv.textContent = '이미 존재하는 아이디입니다.';
                 isIdChecked = false;
@@ -217,8 +240,8 @@ function checkDuplicateId(){
 
 function registerSubmit() {
     submitForm(
-        '/register',
+        '/login/register',
         '회원가입',
-        '/login'
+        '/loginPage'
     );
 }

@@ -6,11 +6,6 @@ var userIdElement = {
     componentValid: document.querySelector('.failure-message2')
 };
 
-var phoneNumberElement = {
-    phoneNumber: document.getElementById("phoneNumber"),
-    formatValid: document.querySelector('.phoneNumber-failure-message')
-};
-
 var nextPasswordElement = {
     nextPassword: document.getElementById("nextPassword"),
     strongPassword: document.querySelector('.strongPassword-message')
@@ -32,7 +27,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const findPasswordBtn = document.getElementById('findPasswordButton');
 
     userIdElement.userId.addEventListener('input',validateFindForm);
-    phoneNumberElement.phoneNumber.addEventListener('input',validateFindForm);
 
     nextPasswordElement.nextPassword.addEventListener('input',validateChangeForm);
     nextPasswordRetypeElement.nextPasswordRetype.addEventListener('input',validateChangeForm);
@@ -64,8 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const formData = new FormData(this);
                 const userData = {};
-                if(findData && findData.id){
-                    userData["id"] = findData.id;
+                if(findData && findData.userId){
+                    userData["userId"] = findData.userId;
                 }else{
                      console.error("ID is missing in findData");
                      alert("사용자 ID를 찾을 수 없습니다.");
@@ -76,18 +70,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 console.log(userData);
                 // 서버에 비밀번호 변경 요청
-                fetch('/changePassword', {
+                fetch('/login/changePassword', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(userData)
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if(!response.ok){
+                        throw new Error('Network response was not ok')
+                    }
+
+                    return response.json()
+                 })
                 .then(data => {
                     if (data.success) {
                         alert('비밀번호가 성공적으로 변경되었습니다.');
-                        window.location.href = '/login'; // 로그인 페이지로 리다이렉트
+                        window.location.href = '/loginPage'; // 로그인 페이지로 리다이렉트
                     } else {
                         alert('비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
                     }
@@ -126,24 +126,6 @@ userIdElement.userId.onkeyup = function(){
     }
 }
 
-phoneNumberElement.phoneNumber.onkeyup = function(){
-    if(phoneNumberElement.phoneNumber.value.length !== 0)
-    {
-        if(checkPhoneNumber(phoneNumberElement.phoneNumber.value) === false)
-        {
-            phoneNumberElement.formatValid.classList.remove('hide');
-        }
-        else
-        {
-            phoneNumberElement.formatValid.classList.add('hide');
-        }
-    }
-    else
-    {
-        phoneNumberElement.formatValid.classList.add('hide');
-    }
-}
-
 nextPasswordElement.nextPassword.onkeyup = function(){
     if(nextPasswordElement.nextPassword.value.length !== 0){
         if(strongPassword(nextPasswordElement.nextPassword.value)){
@@ -174,7 +156,7 @@ async function findPasswordFormSubmit(form){
         formData.forEach((value, key) => { userData[key] = value });
 
          try {
-                const response = await fetch("/findPassword", {
+                const response = await fetch("/login/findPassword", {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json"
@@ -195,6 +177,7 @@ async function findPasswordFormSubmit(form){
                     throw new Error("서버가 JSON이 아닌 응답을 반환했습니다.");
                 }
                 const data = await response.json();
+
                 if (data.success) {
                     return data;
                 }
@@ -206,12 +189,10 @@ async function findPasswordFormSubmit(form){
 
 function validateFindForm() {
     const userId = userIdElement.userId.value;
-    const phoneNumber = phoneNumberElement.phoneNumber.value;
 
     isFindFormValid =
         idLength(userId) &&
-        onlyNumberAndEnglish(userId) &&
-        checkPhoneNumber(phoneNumber);
+        onlyNumberAndEnglish(userId)
 
     updateFindIdButton();
 }
