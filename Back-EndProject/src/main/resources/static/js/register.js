@@ -221,7 +221,7 @@ function checkDuplicateId(){
          })
         .then(data => {
             console.log(data.isDuplicate);
-            if(!data.isDuplicate){
+            if(data.isDuplicate){
                 resultDiv.style.color = 'red';
                 resultDiv.textContent = '이미 존재하는 아이디입니다.';
                 isIdChecked = false;
