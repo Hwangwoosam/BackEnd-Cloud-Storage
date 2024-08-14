@@ -25,9 +25,9 @@
         #{rootPath})
     </insert>
 
-    <update id="changePassword" parameterType="map">
+    <update id="changePassword" parameterType="org.example.mvc.domain.entity.User">
         UPDATE user
-            SET password = #{nextPassword}
+            SET password = #{password}
         WHERE userId = #{userId}
     </update>
 </mapper>
