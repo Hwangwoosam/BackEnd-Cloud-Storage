@@ -1,8 +1,15 @@
 package org.example.configuration;
 
 import lombok.RequiredArgsConstructor;
+import org.example.mvc.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -17,22 +24,16 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import java.util.Arrays;
+import java.util.List;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfig {
-
-//    @Bean
-//    WebSecurityCustomizer webSecurityConfig(){
-//        return web -> web
-//                .ignoring()
-//                .requestMatchers("/images/**")
-//                .requestMatchers("/js/**")
-//                .requestMatchers("/css/**")
-//                .requestMatchers("/favicon/**")
-//                .requestMatchers("/templates/**");
-//    }
+    @Autowired
+    private final UserService userService;
+    @Autowired
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception{
@@ -43,7 +44,7 @@ public class WebSecurityConfig {
                     authorizeHttpRequests
                             .requestMatchers("/**").permitAll()
                 )
-                .csrf((csrf) -> csrf.disable())
+                .csrf().disable()
                 .formLogin((formLogin) ->
                         formLogin
                                 .usernameParameter("userId")
@@ -51,14 +52,18 @@ public class WebSecurityConfig {
                                 .loginPage("/loginPage")
                                 .failureUrl("/login?failed")
                                 .loginProcessingUrl("/login")
+                                .defaultSuccessUrl("/fileListPage")
                         );
         return http.build();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
+    public AuthenticationManager authenticationManager(){
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userService);
+        authProvider.setPasswordEncoder(passwordEncoder);
 
+        return new ProviderManager(authProvider);
+    }
 
 }
