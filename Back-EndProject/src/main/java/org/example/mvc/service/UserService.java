@@ -72,7 +72,6 @@ public class UserService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
         logger.info("loadUserByUsername called with username: {}", username);
-        System.out.println(username);
         UserInfoDTO userInfoDTO = this.userRepository.findByUserId(username);
 
 
