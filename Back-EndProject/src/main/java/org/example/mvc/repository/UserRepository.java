@@ -12,6 +12,5 @@ public interface UserRepository {
     int register(User user);
     UserInfoDTO findByUserId(String userId);
     UserInfoDTO findByUserName(String userName);
-
-    int changePassword(@Param("userId") String userId,@Param("nextPassword")String password);
+    int changePassword(User user);
 }

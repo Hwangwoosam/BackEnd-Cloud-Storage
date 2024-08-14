@@ -90,7 +90,8 @@ public class UserService implements UserDetailsService {
     }
 
     public boolean changePassword(UserChangePassword userChangePassword){
-        return userRepository.changePassword(userChangePassword.getUserId(),
-                passwordEncoder.encode(userChangePassword.getNextPassword())) == 1;
+        User user = new User(userChangePassword.getUserId(),passwordEncoder.encode(userChangePassword.getNextPassword()));
+
+        return userRepository.changePassword(user) == 1;
     }
 }
