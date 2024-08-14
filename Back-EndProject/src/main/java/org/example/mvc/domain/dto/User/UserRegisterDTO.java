@@ -1,4 +1,4 @@
-package org.example.mvc.domain.dto;
+package org.example.mvc.domain.dto.User;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.mvc.domain.entity.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
 public class UserRegisterDTO {
@@ -26,7 +28,6 @@ public class UserRegisterDTO {
 
     @Email(message = "유효한 이메일 형식이 아닙니다")
     private String email;
-
     public UserRegisterDTO(){}
 
     public UserRegisterDTO(String userId, String password, String userName, String phoneNumber, String email, String rootPath){

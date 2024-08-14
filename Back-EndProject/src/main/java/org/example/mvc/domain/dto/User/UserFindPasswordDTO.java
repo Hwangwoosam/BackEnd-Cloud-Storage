@@ -1,4 +1,4 @@
-package org.example.mvc.domain.dto;
+package org.example.mvc.domain.dto.User;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
