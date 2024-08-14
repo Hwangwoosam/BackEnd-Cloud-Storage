@@ -12,13 +12,7 @@
         FROM user
         WHERE name = #{userName}
     </select>
-
-<!--    <select id="login" resultType="org.example.mvc.domain.dto.User.UserInfoDTO">-->
-<!--        SELECT id, name, rootPath,totalSize-->
-<!--        FROM user-->
-<!--        WHERE userId = #{userId} and password = #{password}-->
-<!--    </select>-->
-
+    
     <insert id="register" parameterType="org.example.mvc.domain.entity.User" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO user(userId,password,name,phoneNumber,email,totalSize,rootPath)
         Values(
@@ -31,7 +25,7 @@
         #{rootPath})
     </insert>
 
-    <update id="changePassword" parameterType="org.example.mvc.domain.dto.User.UserChangePassword">
+    <update id="changePassword" parameterType="map">
         UPDATE user
             SET password = #{nextPassword}
         WHERE userId = #{userId}
