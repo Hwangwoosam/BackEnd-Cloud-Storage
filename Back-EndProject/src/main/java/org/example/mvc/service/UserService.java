@@ -3,24 +3,42 @@ package org.example.mvc.service;
 //import org.example.configuration.GlobalConfig;
 //import org.example.mvc.domain.dto.UserInfoDTO;
 import org.example.configuration.GlobalConfiguration;
+import org.example.enums.UserRole;
 import org.example.mvc.domain.dto.User.*;
 import org.example.mvc.domain.entity.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.example.mvc.repository.UserRepository;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    private final GlobalConfiguration globalConfiguration;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    private GlobalConfiguration globalConfiguration;
+    public UserService(GlobalConfiguration globalConfiguration, UserRepository userRepository,PasswordEncoder passwordEncoder){
+        this.globalConfiguration = globalConfiguration;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-    @Autowired
-    private UserRepository userRepository;
 
     public UserInfoDTO findByUserId(String userId){
         UserInfoDTO userInfoDTO = userRepository.findByUserId(userId);
@@ -35,7 +53,8 @@ public class UserService {
     public boolean registerUser(UserRegisterDTO userDto){
         String folderName = UUID.randomUUID().toString();
 
-        User user = new User(userDto,folderName);
+        User user = new User(userDto,passwordEncoder.encode(userDto.getPassword()),folderName);
+
         if(userRepository.register(user) == 0) return false;
 
         File file = new File(globalConfiguration.getUploadPath() + folderName);
@@ -49,17 +68,30 @@ public class UserService {
         return true;
     }
 
-//    public UserInfoDTO login(UserLoginDTO userLoginDTO){
-//        return userRepository.login(userLoginDTO);
-//    }
-//
+    @Override
+    @Transactional
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
+        logger.info("loadUserByUsername called with username: {}", username);
+        System.out.println(username);
+        UserInfoDTO userInfoDTO = this.userRepository.findByUserId(username);
 
-//
-//    public Integer findIdByUserIdAndEmail(UserFindPasswordDTO userFindPasswordDTO){
-//        return userRepository.findId(userFindPasswordDTO);
-//    }
-//
+
+        if(userInfoDTO == null){
+            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
+        }
+
+        List<GrantedAuthority> authorityList = new ArrayList<>();
+        if("administer".equals(username)){
+            authorityList.add(new SimpleGrantedAuthority(UserRole.ADMIN.getValue()));
+        }else{
+            authorityList.add(new SimpleGrantedAuthority(UserRole.USER.getValue()));
+        }
+
+        return new org.springframework.security.core.userdetails.User(userInfoDTO.getUserId(),userInfoDTO.getPassword(),authorityList);
+    }
+
     public boolean changePassword(UserChangePassword userChangePassword){
-        return userRepository.changePassword(userChangePassword) == 1;
+        return userRepository.changePassword(userChangePassword.getUserId(),
+                passwordEncoder.encode(userChangePassword.getNextPassword())) == 1;
     }
 }
