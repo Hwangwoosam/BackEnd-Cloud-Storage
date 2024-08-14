@@ -24,4 +24,9 @@ public class User {
         this.totalSize = 0L;
         this.rootPath = rootPath;
     }
+
+    public User(String userId,String nextPassword){
+        this.userId = userId;
+        this.password = nextPassword;
+    }
 }
