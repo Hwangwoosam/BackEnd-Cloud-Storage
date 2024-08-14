@@ -12,7 +12,7 @@
         FROM user
         WHERE name = #{userName}
     </select>
-    
+
     <insert id="register" parameterType="org.example.mvc.domain.entity.User" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO user(userId,password,name,phoneNumber,email,totalSize,rootPath)
         Values(
