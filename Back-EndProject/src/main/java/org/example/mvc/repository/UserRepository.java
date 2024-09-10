@@ -11,6 +11,6 @@ import java.util.Optional;
 public interface UserRepository {
     int register(User user);
     UserInfoDTO findByUserId(String userId);
-    UserInfoDTO findByUserName(String userName);
+    UserLoginDTO findByUserName(String userName);
     int changePassword(User user);
 }

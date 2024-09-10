@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -12,7 +13,7 @@ import java.util.Collections;
 
 @Getter
 @Data
-public class UserInfoDTO {
+public class UserInfoDTO{
     private int id;
     private String userId;
     private String name;

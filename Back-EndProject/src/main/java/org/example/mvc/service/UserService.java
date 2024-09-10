@@ -1,7 +1,5 @@
 package org.example.mvc.service;
 
-//import org.example.configuration.GlobalConfig;
-//import org.example.mvc.domain.dto.UserInfoDTO;
 import org.example.configuration.GlobalConfiguration;
 import org.example.enums.UserRole;
 import org.example.mvc.domain.dto.User.*;
@@ -22,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -45,9 +42,9 @@ public class UserService implements UserDetailsService {
         return userInfoDTO;
     }
 
-    public UserInfoDTO findByName(String userName){
-        UserInfoDTO userInfoDTO = userRepository.findByUserName(userName);
-        return userInfoDTO;
+    public UserLoginDTO findByName(String userName){
+        UserLoginDTO userLoginDTO = userRepository.findByUserName(userName);
+        return userLoginDTO;
     }
     @Transactional
     public boolean registerUser(UserRegisterDTO userDto){
@@ -86,12 +83,11 @@ public class UserService implements UserDetailsService {
             authorityList.add(new SimpleGrantedAuthority(UserRole.USER.getValue()));
         }
 
-        return new org.springframework.security.core.userdetails.User(userInfoDTO.getUserId(),userInfoDTO.getPassword(),authorityList);
+        return new UserLoginDTO(userInfoDTO,authorityList);
     }
 
     public boolean changePassword(UserChangePassword userChangePassword){
         User user = new User(userChangePassword.getUserId(),passwordEncoder.encode(userChangePassword.getNextPassword()));
-
         return userRepository.changePassword(user) == 1;
     }
 }
