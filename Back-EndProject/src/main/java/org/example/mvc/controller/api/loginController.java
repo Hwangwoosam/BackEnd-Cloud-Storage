@@ -52,7 +52,7 @@ public class loginController {
         String userName = input.get("userName");
 
         try {
-            UserInfoDTO userInfoDTO = userService.findByName(userName);
+            UserLoginDTO userInfoDTO = userService.findByName(userName);
 
             if (userInfoDTO != null) {
                 response.put("success", true);
@@ -96,6 +96,10 @@ public class loginController {
         Map<String,Object> response = new HashMap<>();
 
         try{
+            if(!userChangePassword.getNextPassword().equals(userChangePassword.getNextPasswordRetype())){
+                throw new Exception("Password is manipulated");
+            }
+
             if(userService.changePassword(userChangePassword)) {
                 response.put("success", true);
             }else{
