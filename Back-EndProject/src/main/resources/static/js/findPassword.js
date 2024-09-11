@@ -41,8 +41,14 @@ document.addEventListener('DOMContentLoaded', function() {
             try{
                 const result = await findPasswordFormSubmit(this);
                 findData = result;
-                inputForm.style.display = 'none';
-                changePasswordForm.style.display = 'block';
+                if(findData != null){
+                    inputForm.style.display = 'none';
+                    changePasswordForm.style.display = 'block';
+                }else{
+                    console.error("ID is missing in findData");
+                    alert("사용자 ID를 찾을 수 없습니다.");
+                    return;
+                }
             }catch(error){
                 console.error('Error:', error);
                 alert('비밀번호 찾기 중 오류가 발생했습니다.');
@@ -58,17 +64,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const formData = new FormData(this);
                 const userData = {};
-                if(findData && findData.userId){
-                    userData["userId"] = findData.userId;
-                }else{
-                     console.error("ID is missing in findData");
-                     alert("사용자 ID를 찾을 수 없습니다.");
-                     return;
-                }
+                userData["userId"] = findData.userId;
 
                 formData.forEach((value, key) => { userData[key] = value });
 
-                console.log(userData);
+//                console.log(userData);
                 // 서버에 비밀번호 변경 요청
                 fetch('/login/changePassword', {
                     method: 'POST',
