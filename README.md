@@ -5,5 +5,6 @@
 # DB 설계  
 <details>
   <summary>초기 DB 모델</summary>
-  ![image](https://github.com/Hwangwoosam/BackEnd-Cloud-Storage/assets/61729954/e07f738b-ba2a-47e9-b513-a246346a2200)
+  <img src="https://github.com/Hwangwoosam/BackEnd-Cloud-Storage/assets/61729954/e07f738b-ba2a-47e9-b513-a246346a2200">
+<!--     ![image](https://github.com/Hwangwoosam/BackEnd-Cloud-Storage/assets/61729954/e07f738b-ba2a-47e9-b513-a246346a2200) -->
 </details>
