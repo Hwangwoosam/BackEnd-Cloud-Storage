@@ -1,4 +1,5 @@
-# Back-End Study Project
+# Back-End Study Project  
+* 목표: 구글 드라이브와 같은 Cloud Storage 서비스를 웹 서비스를 통해 제공
 1. [프로젝트 진행 과정 정리](https://github.com/Hwangwoosam/Back-EndProject/wiki)
 
 # DB 설계  
