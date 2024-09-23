@@ -28,7 +28,9 @@ function loginSubmit(){
         if (response.redirected) {
             window.location.href = response.url;
         } else if (!response.ok) {
-            throw new Error('Login failed');
+            return response.json().then(data=>{
+                throw new Error(data.message || '로그인 실패');
+            });
         }
     })
     .catch(error => {
