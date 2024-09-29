@@ -2,81 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.example.mvc.repository.UploadFileRepository">
     <select id="getList" resultType="org.example.mvc.domain.dto.MetaDataDTO">
-        SELECT
-            UF.fileSeq,
-            UF.userName,
-            UF.thumbnailCheck,
-            UF.fileType,
-            UF.fileSize,
-            UF.fileName,
-            UF.filePath,
-            UF.includeDir,
-            UF.createTime
-        FROM metadata UF
-        WHERE UF.userName = #{userName}
-        <if test="includeDir != -1">
-            and UF.includeDir = #{includeDir}
-        </if>
+        SELECT fileSeq,userId,filename,type,size,path,includeDir,createTime
+        From metadata
+        WHERE userId = #{userId}
     </select>
 
-    <select id="get" resultType="org.example.mvc.domain.dto.MetaDataDTO">
-        SELECT
-            UF.fileSeq,
-            UF.userName,
-            UF.thumbnailCheck,
-            UF.fileType,
-            UF.fileSize,
-            UF.fileName,
-            UF.filePath,
-            UF.includeDir,
-            UF.createTime
-        FROM metadata UF
-        WHERE UF.userName = #{userName} and UF.fileSeq = #{fileSeq}
-    </select>
-
-    <insert id="save" parameterType="org.example.mvc.domain.dto.UploadFileDTO">
-        INSERT INTO metadata
-        (
-            userName,
-            fileType,
-            fileSize,
-            fileName,
-            thumbnailCheck,
-            filePath,
-            includeDir,
-            createTime
-        )
-        VALUES
-        (
-            #{userName},
-            #{fileType},
-            #{size},
-            #{fileName},
-            #{thumbnailCheck},
-            #{filePath},
-            #{includeDir},
-            NOW()
-        )
-    </insert>
-
-    <update id="modifyName" parameterType="org.example.mvc.domain.dto.MetaDataDTO">
-        UPDATE metadata SET fileName = #{fileName}
-        WHERE userName = #{userName} and fileSeq = #{fileSeq}
-    </update>
-
-    <delete id="delete" parameterType="java.util.List">
-        DELETE FROM metadata
-        WHERE fileSeq IN (
-        <foreach collection="list" item="tmp" separator=",">
-            #{tmp}
-        </foreach>
-        )
-    </delete>
-
-    <select id="checkFileName" resultType="String">
-        SELECT
-            UF.fileName
-        FROM metadata UF
-        WHERE includeDir = #{includeDir}
-    </select>
 </mapper>
