@@ -42,9 +42,9 @@ public class UserService implements UserDetailsService {
         return userInfoDTO;
     }
 
-    public UserLoginDTO findByName(String userName){
-        UserLoginDTO userLoginDTO = userRepository.findByUserName(userName);
-        return userLoginDTO;
+    public UserInfoDTO findByName(String userName){
+        UserInfoDTO userInfoDTO = userRepository.findByUserName(userName);
+        return userInfoDTO;
     }
     @Transactional
     public boolean registerUser(UserRegisterDTO userDto){
