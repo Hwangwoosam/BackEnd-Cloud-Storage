@@ -26,7 +26,9 @@
     <div class="section">
         <div class="aside">
             <h2>Drive</h2>
-            <div class="edrive-size-info">35MB of 500MB Used</div>
+            <div class="edrive-size-info" th:with="totalGB=${totalSize/(1024*1024*1024)}">
+                <span th:text="${#numbers.formatDecimal(totalGB,1,2)}" th:value="0.00"></span> GB of 15GB Used
+            </div>
             <div class="button">
                 <input type="button" value="+ 추가" />
             </div>
@@ -38,28 +40,22 @@
                     <li>
                         <div style="padding-left: 1em;">
                             <i class="fas fa-caret-down"></i>
-                            <a th:href="@{/file/getList(userName=${userName}, includeDir=0)}"><b>Drive</b></a>
+                            <a th:href="@{/file/getList}"><b>내 파일</b></a>
                         </div>
-                        <div th:if="${sideList.isEmpty()}">등록된 데이터가 없습니다.</div>
-                        <div th:if="${not sideList.isEmpty()}">
-                            <th:block th:fragment="file-tree" th:remove="tag" th:value="2">
-                                <ul class="sub-list-box">
-                                    <li th:each="fileInfo : ${sideList}" th:id="${fileInfo.fileSeq}" th:value="${fileInfo.fileType}">
-                                        <div style="padding-left: 2em;" th:if="${fileInfo.fileType == 0}">
-                                            <i class="fas fa-caret-donw"></i>
-                                            <a href="" th:text="${fileInfo.fileName}"></a>
-                                        </div>
-                                        <ul th:if="${fileInfo.fileType == 1}" class="sub-list-box">
-                                            <div style="padding-left: 2em;" >
-                                                <i class="fas fa-caret-down"></i>
-                                                <a th:href="@{/file/getList(userName=${userName}, includeDir=${fileInfo.fileSeq})}" th:text="${fileInfo.fileName}"></a>
-                                                <th:block th:if="${not fileInfo.subFiles.isEmpty()}" th:with="sideList = ${fileInfo.subFiles}" th:insert="~{this :: file-tree}" th:remove="tag"></th:block>
-                                            </div>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </th:block>
-                        </div>
+                        <div th:if="${#lists.isEmpty(fileList)}">등록된 데이터가 없습니다.</div>
+                        <th:block th:unless="${#lists.isEmpty(fileList)}" th:remove="tag">
+                            <ul class="sub-list-box" th:fragment="file-tree">
+                                <li th:each="file : ${fileList}" th:id="${file.metadata.fileSeq}" th:with="isDir=${file.metadata.fileType == 1}">
+                                    <div th:class="${isDir ? 'pl-8' : 'pl-4'}">
+                                        <i th:class="${isDir ? 'fas fa-folder' : 'fas fa-file'}"></i>
+                                        <span th:text="${file.metadata.fileName}"></span>
+                                    </div>
+                                    <th:block th:if="${isDir and not #lists.isEmpty(file.subFiles)}">
+                                        <ul class="sub-list-box" th:replace="this :: file-tree(files=${file.subFiles})"></ul>
+                                    </th:block>
+                                </li>
+                            </ul>
+                        </th:block>
                     </li>
                 </ul>
             </div>
@@ -72,9 +68,14 @@
                 <div>Type</div>
                 <div>Size</div>
             </div>
-            <div th:if="${curList.isEmpty()}">등록된 데이터가 없습니다.</div>
-            <div th:if="${not curList.isEmpty()}">
-                <div th:each="fileInfo, iterStat : ${curList}" class="edrive-table-data-row" th:value="${fileInfo.fileSeq}" th:id="'fileInfoElement_' + ${iterStat.index}">
+            <div th:if="${fileList.isEmpty()}">등록된 데이터가 없습니다.</div>
+            <th:block th:unless="${#lists.isEmpty(fileList)}" th:remove="tag">
+                <div th:each="file : ${fileList}" class="edrive-table-data-row" th:value="${file.metadata.fileSeq}" th:id="${file.metadata.fileSeq}">
+                    <i class="fas fa-folder edrive-file-icon"></i>
+                </div>
+            </th:block>
+            <div th:if="${not fileList.isEmpty()}">
+                <div th:each="fileInfo, iterStat : ${fileList}" class="edrive-table-data-row" th:value="${fileInfo.fileSeq}" th:id="'fileInfoElement_' + ${iterStat.index}">
                     <div th:if="${fileInfo.fileType == 1}" class="data-name">
                         <i class="fas fa-folder edrive-file-icon"></i>
                         <a th:href="@{/file/getList(userName=${userName}, includeDir=${fileInfo.fileSeq})}" th:text="${fileInfo.fileName}"></a>
@@ -94,17 +95,17 @@
     <footer></footer>
 </div>
 
-<ul th:id="contextMenu" class="contextmenu" th:value="${userName}">
-    <li><a th:id="delete" href="#">삭제</a></li>
-    <li><a th:id="download" href="#">다운로드</a></li>
-    <li><a th:id="rename" href="#">이름 변경</a></li>
-    <li><a th:id="move" href="#">이동</a></li>
-    <li><a th:id="copy" href="#">복사</a></li>
-</ul>
+<!--<ul th:id="contextMenu" class="contextmenu" th:value="${userName}">-->
+<!--    <li><a th:id="delete" href="#">삭제</a></li>-->
+<!--    <li><a th:id="download" href="#">다운로드</a></li>-->
+<!--    <li><a th:id="rename" href="#">이름 변경</a></li>-->
+<!--    <li><a th:id="move" href="#">이동</a></li>-->
+<!--    <li><a th:id="copy" href="#">복사</a></li>-->
+<!--</ul>-->
 
-<div th:id="sideList" th:value="${sideList}"></div>
-<div th:id="userName" th:value="${userName}"></div>
-<div th:id="includeDir" th:value="${includeDir}"></div>
+<!--<div th:id="sideList" th:value="${sideList}"></div>-->
+<!--<div th:id="userName" th:value="${userName}"></div>-->
+<!--<div th:id="includeDir" th:value="${includeDir}"></div>-->
 <script type="text/javascript" src="/js/file_list.js"></script>
 </body>
 </html>
