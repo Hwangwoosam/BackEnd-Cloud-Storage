@@ -50,9 +50,9 @@ public class loginController {
         Map<String,Object> response = new HashMap<>();
 
         String userName = input.get("userName");
-
+        System.out.println(userName);
         try {
-            UserLoginDTO userInfoDTO = userService.findByName(userName);
+            UserInfoDTO userInfoDTO = userService.findByName(userName);
 
             if (userInfoDTO != null) {
                 response.put("success", true);
@@ -69,7 +69,7 @@ public class loginController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("findPassword")
+    @PostMapping("/findPassword")
     public ResponseEntity<Map<String,Object>> findPassword(@Valid @RequestBody Map<String, String> input){
         Map<String,Object> response = new HashMap<>();
 
